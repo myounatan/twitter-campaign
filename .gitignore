@@ -41,3 +41,6 @@
 # vscode
 .vscode
 .vscode/*
+
+# typechain
+**/typechain
