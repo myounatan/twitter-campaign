@@ -1,0 +1,28 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: CampaignManager
+    network: mumbai
+    source:
+      address: '0x425E9E63bc1cEfd37e1E3041F9E8193Ad265eF18'
+      abi: CampaignManager
+      startBlock: 38180413
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - CampaignCreated
+        - OwnershipTransferred
+        - RewardClaimed
+      abis:
+        - name: CampaignManager
+          file: ./abis/CampaignManager.json
+      eventHandlers:
+        - event: CampaignCreated(indexed uint256,indexed address,string,string,string,uint256,uint256,uint256)
+          handler: handleCampaignCreated
+        - event: RewardClaimed(indexed uint256,indexed address,uint256,uint256,uint256,uint256)
+          handler: handleRewardClaimed
+      file: ./src/campaign-manager.ts

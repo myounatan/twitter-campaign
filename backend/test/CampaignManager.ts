@@ -39,20 +39,29 @@ describe("CampaignManager", function () {
     await campaignManager.createCampaignNative(campaignName, campaignDescription, tweetString, tokensPerLike, tokensPerRetweet, { value: totalRewards });
 
     // get campaign
-    const [campaignName1, campaignDescription1, tweetString1, tokensPerLike1, tokensPerRetweet1, rewardsLeft] = await campaignManager.getCampaignInfo(campaignId);
+    {
+      let [campaignName1, campaignDescription1, tweetString1, tokensPerLike1, tokensPerRetweet1, rewardsLeft] = await campaignManager.getCampaignInfo(campaignId);
 
-    // expect campaign to be correct
-    expect(campaignName1).to.equal(campaignName);
-    expect(campaignDescription1).to.equal(campaignDescription);
-    expect(tweetString1).to.equal(tweetString);
-    expect(tokensPerLike1).to.equal(tokensPerLike);
-    expect(tokensPerRetweet1).to.equal(tokensPerRetweet);
-    expect(rewardsLeft).to.equal(totalRewards);
+      // expect campaign to be correct
+      expect(campaignName1).to.equal(campaignName);
+      expect(campaignDescription1).to.equal(campaignDescription);
+      expect(tweetString1).to.equal(tweetString);
+      expect(tokensPerLike1).to.equal(tokensPerLike);
+      expect(tokensPerRetweet1).to.equal(tokensPerRetweet);
+      expect(rewardsLeft).to.equal(totalRewards);
+    }
 
     // pre calculate rewards
     const [tokensRewarded, likesRewarded, retweetsRewarded] = await campaignManager.calculateRewards([0, 0], tweetInfo, [tokensPerLike, tokensPerRetweet]);
 
     // claim rewards
     await expect(campaignManager.claimRewardNativeTo(account1.address, campaignId, tweetId, tweetInfo)).to.emit(campaignManager, 'RewardClaimed').withArgs(campaignId, account1.address, tweetId, tokensRewarded, likesRewarded, retweetsRewarded);
+  
+    {
+      let [campaignName1, campaignDescription1, tweetString1, tokensPerLike1, tokensPerRetweet1, rewardsLeft] = await campaignManager.getCampaignInfo(campaignId);
+      
+      // expect rewards to be deducted
+      expect(rewardsLeft).to.equal(totalRewards.sub(tokensRewarded));
+    }
   });
 });

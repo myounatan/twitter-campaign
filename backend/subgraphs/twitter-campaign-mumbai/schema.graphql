@@ -1,0 +1,50 @@
+type Campaign @entity(immutable: true) {
+  id: Bytes!
+
+  campaignId: BigInt! # uint256
+  owner: Bytes! # address
+  name: String! # string
+  description: String! # string
+  tweetString: String! # string
+  tokensPerLike: BigInt! # uint256
+  tokensPerRetweet: BigInt! # uint256
+  rewardsLeft: BigInt! # uint256
+  # generic metadata
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  # relations
+  participants: [UserCampaign!]! @derivedFrom(field: "campaign")
+  rewardLogs: [RewardLog!]! @derivedFrom(field: "campaign")
+}
+
+type RewardLog @entity(immutable: true) {
+  id: Bytes!
+
+  campaign: Campaign! # same as Campaign.id
+  wallet: Bytes! # address
+  tweetId: BigInt! # uint256
+  tokensRewarded: BigInt! # uint256
+  likesRewarded: BigInt! # uint256
+  retweetsRewarded: BigInt! # uint256
+  # generic metadata
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type User @entity(immutable: true) {
+  id: Bytes!
+
+  wallet: Bytes! # address
+  totalRewardsClaimed: BigInt! # uint256
+  # relations
+  campaigns: [UserCampaign!] @derivedFrom(field: "user")
+}
+
+# record a user participating in campaign
+type UserCampaign @entity(immutable: true) {
+  id: Bytes! # Set to `user.id.concat(organization.id)`
+  user: User!
+  campaign: Campaign!
+}
