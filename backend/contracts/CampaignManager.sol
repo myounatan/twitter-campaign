@@ -67,9 +67,10 @@ contract CampaignManager is Ownable, ReentrancyGuard {
         uint256 rewardsLeft
     );
 
-    event CampaignRewarded(
+    event RewardClaimed(
         uint256 indexed campaignId,
         address indexed wallet,
+        uint256 tweetId,
         uint256 tokensRewarded,
         uint256 likesRewarded,
         uint256 retweetsRewarded
@@ -109,6 +110,31 @@ contract CampaignManager is Ownable, ReentrancyGuard {
 
     // public functions
 
+    function getCampaignInfo(
+        uint256 _campaignId
+    )
+        public
+        view
+        campaignExists(_campaignId)
+        returns (
+            string memory,
+            string memory,
+            string memory,
+            uint256,
+            uint256,
+            uint256
+        )
+    {
+        return (
+            campaigns[_campaignId].name,
+            campaigns[_campaignId].description,
+            campaigns[_campaignId].tweetString,
+            campaigns[_campaignId].tweetRewardStats.tokensPerLike,
+            campaigns[_campaignId].tweetRewardStats.tokensPerRetweet,
+            campaigns[_campaignId].rewardsLeft
+        );
+    }
+
     // creates a campaign with reward token as the native
     function createCampaignNative(
         string memory _name,
@@ -116,7 +142,7 @@ contract CampaignManager is Ownable, ReentrancyGuard {
         string memory _tweetString,
         uint256 _tokensPerLike,
         uint256 _tokensPerRetweet
-    ) public payable nonReentrant nonZeroAmount(msg.value) {
+    ) public payable nonReentrant nonZeroAmount(msg.value) returns (uint256) {
         uint256 rewardsLeft = msg.value;
 
         campaigns[campaignCount].owner = msg.sender;
@@ -148,17 +174,18 @@ contract CampaignManager is Ownable, ReentrancyGuard {
             _tokensPerRetweet,
             rewardsLeft
         );
+
+        return campaignCount;
     }
 
     // reward user for tweet
     // TODO: check if this handles like/retweet counter going down
-    function claimRewardNative(
+    function claimRewardNativeTo(
+        address participant,
         uint256 _campaignId,
         uint256 _tweetId,
         TweetInfo memory _currentTweetInfo
     ) public nonReentrant onlyBackendAdmin campaignExists(_campaignId) {
-        address participant = msg.sender;
-
         Campaign storage campaign = campaigns[_campaignId];
 
         // calculate rewards
@@ -166,7 +193,7 @@ contract CampaignManager is Ownable, ReentrancyGuard {
             uint256 tokensRewarded,
             uint256 likesRewarded,
             uint256 retweetsRewarded
-        ) = _calculateRewards(
+        ) = calculateRewards(
                 campaign.lastTweetInfoRewarded[_tweetId],
                 _currentTweetInfo,
                 campaign.tweetRewardStats
@@ -190,21 +217,22 @@ contract CampaignManager is Ownable, ReentrancyGuard {
         (bool success, ) = payable(participant).call{value: tokensRewarded}("");
         if (!success) revert FailedToSendRewards(participant, tokensRewarded);
 
-        emit CampaignRewarded(
+        emit RewardClaimed(
             _campaignId,
             participant,
+            _tweetId,
             tokensRewarded,
             likesRewarded,
             retweetsRewarded
         );
     }
 
-    function _calculateRewards(
+    function calculateRewards(
         TweetInfo memory _lastTweet,
         TweetInfo memory _currentTweet,
         TweetRewardStats memory _tweetRewardStats
     )
-        internal
+        public
         pure
         returns (
             uint256 tokensRewarded,

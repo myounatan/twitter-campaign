@@ -1,7 +1,7 @@
 import hre, { ethers } from 'hardhat';
 
 import 'dotenv/config';
-import { verify } from './utils';
+import { verify } from '../utils';
 
 async function main() {
   const backendAdmin = '0x0D0bA03CFd9f99B4aAa19e75Ee7C4C4FA4EB55BC';

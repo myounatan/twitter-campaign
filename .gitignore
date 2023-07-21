@@ -44,3 +44,7 @@
 
 # typechain
 **/typechain
+
+# hardhat
+**/artifacts
+**/cache

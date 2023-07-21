@@ -1,5 +1,5 @@
 import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import { Contract } from 'ethers';
+import { BigNumber, Contract, ethers } from 'ethers';
 
 // cosntructorArgs is an array here
 export const verify = async (hre: HardhatRuntimeEnvironment, contract: Contract, contractPath: string, constructorArgs: any) => {
@@ -17,4 +17,8 @@ export const verify = async (hre: HardhatRuntimeEnvironment, contract: Contract,
   await hre.run('verify:verify', { address: contract.address, contract: contractPath, constructorArguments: constructorArgs });
 
   console.log('Contract verified (still check etherscan)!');
+};
+
+export const CONVERT_WEI = (amount: number): BigNumber => {
+  return ethers.utils.parseEther(amount.toString());
 };
