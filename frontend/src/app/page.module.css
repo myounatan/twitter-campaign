@@ -1,3 +1,7 @@
+.twitterprofilepic {
+  border-radius: 50%;
+}
+
 .main {
   display: flex;
   flex-direction: column;
