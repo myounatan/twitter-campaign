@@ -1,63 +1,38 @@
 import 'dotenv/config';
 
 // https://thegraph.com/docs/en/querying/querying-from-an-application/#apollo-client
-import { ApolloClient, InMemoryCache, gql } from '@apollo/client'
+import { ApolloClient, DocumentNode, InMemoryCache, gql } from '@apollo/client'
 
+console.log(process.env.GRAPHQL_ENDPOINT)
 const client = new ApolloClient({
-  uri: process.env.GRAPHQL_ENDPOINT,
+  uri: 'https://api.studio.thegraph.com/query/12604/twitter-campaign-mumbai/version/latest',
   cache: new InMemoryCache(),
 })
 
-export async function queryApollo(query: string, variables?: any) {
-  return await client.query({ query: gql(query), variables: variables })
+export async function queryApollo(query: DocumentNode, variables?: any) {
+  return (await client.query({ query: query, variables: variables })).data
 }
 
 // helper queries
-export const GET_CAMPAIGNS = `
-  campaigns($first: Int) {
-    campaignId
+export const GET_CAMPAIGNS = gql(`
+  query GetCampaigns($first: Int!) {
+    campaigns(first: $first) {
+      campaignId
 
-    owner
-    name
-    description 
-    tweetString
+      owner
+      name
+      description 
+      tweetString
 
-    tokensPerLike
-    tokensPerRetweet
+      tokensPerLike
+      tokensPerRetweet
 
-    rewardsLeft
-  }
-`
+      rewardsLeft
 
-export const GET_CAMPAIGN = `
-  campaign($campaignId: String!) {
-    campaignId
-
-    owner
-    name
-    description 
-    tweetString
-
-    tokensPerLike
-    tokensPerRetweet
-
-    rewardsLeft
-
-    participantCount
-  }
-`
-
-export const GET_CAMPAIGN_PARTICIPANTS = `
-  campaign($campaignId: String!) {
-    participantCount
-
-    participants($first: Int) {
-      user {
-        wallet
-      }
+      participantCount
     }
   }
-`
+`)
 
 export const GET_CAMPAIGN_FULL = `
   campaign($campaignId: String!) {
@@ -93,10 +68,16 @@ export const GET_CAMPAIGN_REWARDLOGS = `
   }
 `
 
-export const GET_ALL_REWARD_LOGS_IN_ORDER = `
-  rewardLogs($first: Int, orderBy: blockTimestamp, orderDirection: desc) {
-    id
-    wallet
-    tweetId
+export const GET_SORTED_REWARDLOGS = gql(`
+  query GetSortedRewardLogs($first: Int!) {
+    rewardLogs(first: $first, orderBy: blockTimestamp, orderDirection: desc) {
+      id
+      wallet
+      tweetId
+      tokensRewarded
+      campaign {
+        campaignId
+      }
+    }
   }
-`
+`)

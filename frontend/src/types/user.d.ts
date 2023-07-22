@@ -2,6 +2,7 @@ import { AuthKitSignInData, Web3AuthModalPack } from "@safe-global/auth-kit";
 
 export interface Account {
   wallet: string;
+  balance: string; // parsed balance
   email: string;
   twitterUserId: number;
   twitterName: string;
@@ -19,6 +20,11 @@ export interface LoginState {
 export type UserContextType = {
   // account state object
   account: Account | null;
+
+  signature: string | null;
+
+  provider: any | null;
+  signer: any | null;
 
   // login state object
   loginState: LoginState | null;

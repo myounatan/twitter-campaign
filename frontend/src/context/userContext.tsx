@@ -7,6 +7,7 @@ import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
 import { Web3AuthOptions } from "@web3auth/modal";
 
 import Transak from "@biconomy/transak";
+import { ethers } from "ethers";
 
 export const UserContext = createContext<UserContextType | null>(null);
 
@@ -19,10 +20,15 @@ const UserProvider: React.FC<Props> = ({ children }) => {
 
   const [loginState, setLoginState] = useState<LoginState | null>(null);
 
+  const [provider, setProvider] = useState<any | null>(null);
+  const [signer, setSigner] = useState<any | null>(null);
+
   const [transak, setTransak] = useState<any | null>(null);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loadingLogin, setLoadingLogin] = useState(false);
+
+  const [signature, setSignature] = useState<string | null>(null);
 
 
   const options: Web3AuthOptions = {
@@ -114,8 +120,20 @@ const UserProvider: React.FC<Props> = ({ children }) => {
     setLoadingLogin(false);
     setIsLoggedIn(true);
 
+    // use ethers to get balance of signData.eoa
+    // https://docs.ethers.io/v5/api/signer/#Signer-getBalance
+
+    const providerSource: any = web3AuthModalPack.getProvider();
+    const web3Provider = new ethers.providers.Web3Provider(providerSource)
+    const eoaSigner = web3Provider.getSigner()
+
+    const balance = await eoaSigner.getBalance();
+
+    const parsedBalance = ethers.utils.formatEther(balance);
+
     setAccount({
       wallet: signData.eoa,
+      balance: parsedBalance,
       email: userInfo.email,
       twitterUserId: twitterUserId,
       twitterName: userInfo.name,
@@ -123,6 +141,9 @@ const UserProvider: React.FC<Props> = ({ children }) => {
       profileImage: userInfo.profileImage,
       idToken: userInfo.idToken,
     });
+
+    setProvider(web3Provider);
+    setSigner(eoaSigner);
 
     console.log(signData)
     console.log(userInfo)
@@ -147,17 +168,22 @@ const UserProvider: React.FC<Props> = ({ children }) => {
       console.log(parsedToken);
       console.log(parsedToken.wallets[0].public_key);
 
-      const res = await fetch("/api/auth", {
-        method: "POST",
+      const res = await fetch('/api/auth', {
+        method: 'POST',
         headers: {
           "Content-Type": "application/json",
           Authorization: "Bearer " + idToken,
         },
-        body: JSON.stringify({ appPubKey: parsedToken.wallets[0].public_key }),
+        body: JSON.stringify({ appPubKey: parsedToken.wallets[0].public_key, wallet: signData.eoa }),
       });
       if (res.status === 200) {
         console.log("JWT Verification is Successful");
         // allow login
+
+        const data = await res.json();
+        setSignature(data.signature);
+
+        console.log('data.signature', data.signature)
       } else {
         console.log("JWT Verification Failed");
 
@@ -185,7 +211,7 @@ const UserProvider: React.FC<Props> = ({ children }) => {
   }
 
   return (
-    <UserContext.Provider value={{ account, loginState, transak, isLoggedIn, loadingLogin, login, logout, fundTransak }}>
+    <UserContext.Provider value={{ account, signature, loginState, provider, signer, transak, isLoggedIn, loadingLogin, login, logout, fundTransak }}>
       {children}
     </UserContext.Provider>
   );

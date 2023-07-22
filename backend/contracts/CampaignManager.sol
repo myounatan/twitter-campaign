@@ -81,6 +81,7 @@ contract CampaignManager is Ownable, ReentrancyGuard {
     error ZeroAmount();
     error OnlyBackendAdmin();
     error CampaignDoesNotExist();
+    error OnlyCampaignOwner();
     error NoRewardToClaim();
     error NotEnoughRewardsLeft();
     error FailedToSendRewards(address participant, uint256 amount);
@@ -99,6 +100,12 @@ contract CampaignManager is Ownable, ReentrancyGuard {
 
     modifier nonZeroAmount(uint256 amount) {
         if (amount == 0) revert ZeroAmount();
+        _;
+    }
+
+    modifier onlyCampaignOwner(uint256 _campaignId) {
+        if (msg.sender != campaigns[_campaignId].owner)
+            revert OnlyCampaignOwner();
         _;
     }
 
@@ -178,6 +185,67 @@ contract CampaignManager is Ownable, ReentrancyGuard {
         return campaignCount;
     }
 
+    function calculateRewards(
+        TweetInfo memory _lastTweet,
+        TweetInfo memory _currentTweet,
+        TweetRewardStats memory _tweetRewardStats
+    )
+        public
+        pure
+        returns (
+            uint256 tokensRewarded,
+            uint256 likesRewarded,
+            uint256 retweetsRewarded
+        )
+    {
+        // check last tweet info is less than current tweet info in either likes or retweets
+        uint256 lastLikes = _lastTweet.likes;
+        uint256 lastRetweets = _lastTweet.retweets;
+
+        uint256 currentLikes = _currentTweet.likes;
+        uint256 currentRetweets = _currentTweet.retweets;
+
+        if (lastLikes < currentLikes) {
+            likesRewarded = currentLikes - lastLikes;
+        }
+
+        if (lastRetweets < currentRetweets) {
+            retweetsRewarded = currentRetweets - lastRetweets;
+        }
+
+        if (likesRewarded == 0 && retweetsRewarded == 0)
+            revert NoRewardToClaim();
+
+        // calulated in wei
+        tokensRewarded =
+            likesRewarded *
+            _tweetRewardStats.tokensPerLike +
+            retweetsRewarded *
+            _tweetRewardStats.tokensPerRetweet;
+    }
+
+    // public onlyCampaignOwner
+
+    function withdrawCampaignFunds(
+        uint256 _campaignId
+    ) public onlyCampaignOwner(_campaignId) campaignExists(_campaignId) {
+        (bool success, ) = payable(msg.sender).call{
+            value: address(this).balance
+        }("");
+        if (!success)
+            revert FailedToSendRewards(msg.sender, address(this).balance);
+    }
+
+    // public onlyOwner
+
+    function withdraw() public onlyOwner {
+        (bool success, ) = payable(owner()).call{value: address(this).balance}(
+            ""
+        );
+        if (!success)
+            revert FailedToSendRewards(owner(), address(this).balance);
+    }
+
     // reward user for tweet
     // TODO: check if this handles like/retweet counter going down
     function claimRewardNativeTo(
@@ -225,44 +293,5 @@ contract CampaignManager is Ownable, ReentrancyGuard {
             likesRewarded,
             retweetsRewarded
         );
-    }
-
-    function calculateRewards(
-        TweetInfo memory _lastTweet,
-        TweetInfo memory _currentTweet,
-        TweetRewardStats memory _tweetRewardStats
-    )
-        public
-        pure
-        returns (
-            uint256 tokensRewarded,
-            uint256 likesRewarded,
-            uint256 retweetsRewarded
-        )
-    {
-        // check last tweet info is less than current tweet info in either likes or retweets
-        uint256 lastLikes = _lastTweet.likes;
-        uint256 lastRetweets = _lastTweet.retweets;
-
-        uint256 currentLikes = _currentTweet.likes;
-        uint256 currentRetweets = _currentTweet.retweets;
-
-        if (lastLikes < currentLikes) {
-            likesRewarded = currentLikes - lastLikes;
-        }
-
-        if (lastRetweets < currentRetweets) {
-            retweetsRewarded = currentRetweets - lastRetweets;
-        }
-
-        if (likesRewarded == 0 && retweetsRewarded == 0)
-            revert NoRewardToClaim();
-
-        // calulated in wei
-        tokensRewarded =
-            likesRewarded *
-            _tweetRewardStats.tokensPerLike +
-            retweetsRewarded *
-            _tweetRewardStats.tokensPerRetweet;
     }
 }
