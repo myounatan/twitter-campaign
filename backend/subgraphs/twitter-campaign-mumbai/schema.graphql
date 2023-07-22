@@ -13,6 +13,8 @@ type Campaign @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  # counters
+  participantCount: BigInt! # uint256
   # relations
   participants: [UserCampaign!]! @derivedFrom(field: "campaign")
   rewardLogs: [RewardLog!]! @derivedFrom(field: "campaign")

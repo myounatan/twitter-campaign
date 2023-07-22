@@ -61,6 +61,7 @@ export function handleRewardClaimed(event: RewardClaimedEvent): void {
   let campaign = Campaign.load(Bytes.fromHexString(event.params.campaignId.toHexString()))
   if (campaign) {
     campaign.rewardsLeft = campaign.rewardsLeft.minus(event.params.tokensRewarded)
+    campaign.participantCount = campaign.participantCount.plus(BigInt.fromI32(1))
     campaign.save()
   }
 

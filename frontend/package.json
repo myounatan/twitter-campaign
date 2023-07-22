@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@apollo/client": "^3.7.17",
+    "@biconomy/transak": "^3.0.0-alpha.0",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@mui/lab": "^5.0.0-alpha.137",
@@ -27,6 +29,7 @@
     "eslint": "8.45.0",
     "eslint-config-next": "13.4.11",
     "ethers": "^5.7.2",
+    "graphql": "^16.7.1",
     "jose": "^4.14.4",
     "next": "13.4.11",
     "node-fetch": "^3.3.1",

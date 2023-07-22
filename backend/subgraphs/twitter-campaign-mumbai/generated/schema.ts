@@ -195,6 +195,19 @@ export class Campaign extends Entity {
     this.set("transactionHash", Value.fromBytes(value));
   }
 
+  get participantCount(): BigInt {
+    let value = this.get("participantCount");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set participantCount(value: BigInt) {
+    this.set("participantCount", Value.fromBigInt(value));
+  }
+
   get participants(): UserCampaignLoader {
     return new UserCampaignLoader(
       "Campaign",
