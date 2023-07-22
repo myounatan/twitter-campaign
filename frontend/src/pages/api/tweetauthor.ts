@@ -52,6 +52,7 @@ export default async function handler(
     */
 
     const json: any = await response.json();
+    console.log(json)
     const tweetData = json.data;
     const tweetIncludes = json.includes;
     const authorId = tweetData.author_id;
