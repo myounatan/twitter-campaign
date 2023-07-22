@@ -12,7 +12,7 @@ import { Bytes, BigInt } from '@graphprotocol/graph-ts'
 
 export function handleCampaignCreated(event: CampaignCreatedEvent): void {
   let entity = new Campaign(
-    Bytes.fromHexString(event.params.campaignId.toHexString())
+    Bytes.empty().concatI32(event.params.campaignId.toI32())
   )
   entity.campaignId = event.params.campaignId
   entity.owner = event.params.owner
@@ -22,6 +22,8 @@ export function handleCampaignCreated(event: CampaignCreatedEvent): void {
   entity.tokensPerLike = event.params.tokensPerLike
   entity.tokensPerRetweet = event.params.tokensPerRetweet
   entity.rewardsLeft = event.params.rewardsLeft
+
+  entity.participantCount = BigInt.fromI32(0)
 
   entity.blockNumber = event.block.number
   entity.blockTimestamp = event.block.timestamp
@@ -35,7 +37,7 @@ export function handleRewardClaimed(event: RewardClaimedEvent): void {
     event.transaction.hash
   )
   
-  entity.campaign = Bytes.fromHexString(event.params.campaignId.toHexString())
+  entity.campaign = Bytes.empty().concatI32(event.params.campaignId.toI32())
 
   entity.wallet = event.params.wallet
 
@@ -58,7 +60,7 @@ export function handleRewardClaimed(event: RewardClaimedEvent): void {
   entity.transactionHash = event.transaction.hash
 
   // update campaign rewards left
-  let campaign = Campaign.load(Bytes.fromHexString(event.params.campaignId.toHexString()))
+  let campaign = Campaign.load(Bytes.empty().concatI32(event.params.campaignId.toI32()))
   if (campaign) {
     campaign.rewardsLeft = campaign.rewardsLeft.minus(event.params.tokensRewarded)
     campaign.participantCount = campaign.participantCount.plus(BigInt.fromI32(1))

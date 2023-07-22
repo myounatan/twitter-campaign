@@ -145,6 +145,8 @@ contract CampaignManager is Ownable, ReentrancyGuard {
     ) public payable nonReentrant nonZeroAmount(msg.value) returns (uint256) {
         uint256 rewardsLeft = msg.value;
 
+        campaignCount++;
+
         campaigns[campaignCount].owner = msg.sender;
         campaigns[campaignCount].name = _name;
         campaigns[campaignCount].description = _description;
@@ -161,8 +163,6 @@ contract CampaignManager is Ownable, ReentrancyGuard {
 
         campaigns[campaignCount].rewardsLeft = rewardsLeft;
         campaigns[campaignCount].rewardToken.rewardType = RewardType.NATIVE;
-
-        campaignCount++;
 
         emit CampaignCreated(
             campaignCount,

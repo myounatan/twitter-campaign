@@ -63,8 +63,9 @@ export default async function handler(
   // replace id with req.body.id
   // use node fetch
 
-  const tweetId = req.body.tweetId;
-  const campaignId = req.body.campaignId;
+  const body = JSON.parse(req.body);
+  const tweetId = body.tweetId;
+  const campaignId = body.campaignId;
 
   const bearerToken = process.env.TWITTER_BEARER_TOKEN;
   const url = `https://api.twitter.com/2/tweets/${tweetId}?tweet.fields=public_metrics`;
@@ -116,6 +117,15 @@ export default async function handler(
     const signer = new ethers.Wallet(process.env.DEV_PRIVATE_KEY, provider);
 
     const campaignManagerContract = new ethers.Contract(process.env.CAMPAIGN_MANAGER_ADDRESS, CAMPAIGN_MANAGER_ABI, signer);
+
+    // get campaign info
+    const [_, __, tweetString, ___, ____, _____] = await campaignManagerContract.getCampaignInfo(campaignId);
+
+    // check data.text contains tweetString
+    if (!tweet.text.includes(tweetString)) {
+      res.status(400).json({ error: `Tweet does not contain the correct tweet string (${tweetString})` })
+      return;
+    }
 
     const tx = await campaignManagerContract.claimRewardNativeTo(signer.address, campaignId, tweetId, [likeCount, retweetCount], { gasLimit: 1000000 });
 
