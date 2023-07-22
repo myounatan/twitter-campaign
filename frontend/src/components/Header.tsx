@@ -134,6 +134,9 @@ export default function Header() {
         // allow login
       } else {
         console.log("JWT Verification Failed");
+
+        // logout
+        await logout();
       }
     }
   }
