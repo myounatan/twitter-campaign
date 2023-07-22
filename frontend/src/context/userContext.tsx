@@ -15,6 +15,24 @@ interface Props {
   children: React.ReactNode;
 }
 
+export const getTwitterHandleFromId = async (twitterUserId: string) => {
+  const res = await fetch('/api/twitteruser', {
+    method: 'POST',
+    body: JSON.stringify({ userId: twitterUserId }),
+  });
+
+  console.log(res)
+
+  if (res.status === 200) {
+    const data = await res.json();
+    console.log(`Received twitter handle ${data.twitterHandle}`);
+
+    return data.twitterHandle;
+  } else {
+    throw new Error('no twitter handle');
+  }
+}
+
 const UserProvider: React.FC<Props> = ({ children }) => {
   const [account, setAccount] = useState<Account | null>(null);
 
@@ -99,22 +117,12 @@ const UserProvider: React.FC<Props> = ({ children }) => {
     let twitterHandle = '';
 
     // get user twitter handle
-    const res = await fetch('/api/twitteruser', {
-      method: 'POST',
-      body: JSON.stringify({ userId: twitterUserId }),
-    });
-
-    console.log(res)
-
-    if (res.status === 200) {
-      const data = await res.json();
-      console.log(`Received twitter handle ${data.username}`);
-
-      twitterHandle = data.username;
-    } else {
+    try {
+      twitterHandle = await getTwitterHandleFromId(twitterUserId);
+    } catch (e) {
       setLoadingLogin(false);
 
-      throw new Error('no twitter handle');
+      console.log(e);
     }
 
     setLoadingLogin(false);
@@ -174,7 +182,7 @@ const UserProvider: React.FC<Props> = ({ children }) => {
           "Content-Type": "application/json",
           Authorization: "Bearer " + idToken,
         },
-        body: JSON.stringify({ appPubKey: parsedToken.wallets[0].public_key, wallet: signData.eoa }),
+        body: JSON.stringify({ appPubKey: parsedToken.wallets[0].public_key, wallet: signData.eoa, twitterUserId: twitterUserId }),
       });
       if (res.status === 200) {
         console.log("JWT Verification is Successful");

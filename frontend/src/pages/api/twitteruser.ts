@@ -5,7 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import fetch from 'node-fetch'
 
 type Data = {
-  username?: string
+  twitterHandle?: string
   error?: string
 }
 
@@ -27,7 +27,7 @@ export default async function handler(
     const response = await fetch(url, {headers: {'Authorization': `Bearer ${bearerToken}`}});
     
     /*
-    returns smthn like:
+    returns:
 
     {
       "data": {
@@ -43,7 +43,7 @@ export default async function handler(
 
     console.log('userData', userData)
 
-    res.status(200).json({ username: userData.username })
+    res.status(200).json({ twitterHandle: userData.username })
   } catch (error: any) {
     console.log('ERRRRRRROR', error);
     res.status(500).json({ error: error.message });

@@ -5,7 +5,8 @@ import {
 import {
   Campaign,
   RewardLog,
-  User
+  User,
+  UserCampaign
 } from "../generated/schema"
 
 import { Bytes, BigInt } from '@graphprotocol/graph-ts'
@@ -37,15 +38,20 @@ export function handleRewardClaimed(event: RewardClaimedEvent): void {
     event.transaction.hash
   )
   
-  entity.campaign = Bytes.empty().concatI32(event.params.campaignId.toI32())
+  const campaignKey: Bytes = Bytes.empty().concatI32(event.params.campaignId.toI32())
+  const userKey: Bytes = event.params.wallet
+  const userCampaignKey: Bytes = userKey.concat(campaignKey)
+
+  entity.campaign = campaignKey
 
   entity.wallet = event.params.wallet
 
   // check if User entity exists
-  let user = User.load(event.params.wallet)
+  let user = User.load(userKey)
   if (!user) {
-    user = new User(event.params.wallet)
+    user = new User(userKey)
     user.totalRewardsClaimed = BigInt.fromI32(0)
+    user.wallet = event.params.wallet
   }
 
   user.totalRewardsClaimed = user.totalRewardsClaimed.plus(event.params.tokensRewarded)
@@ -60,11 +66,19 @@ export function handleRewardClaimed(event: RewardClaimedEvent): void {
   entity.transactionHash = event.transaction.hash
 
   // update campaign rewards left
-  let campaign = Campaign.load(Bytes.empty().concatI32(event.params.campaignId.toI32()))
+  let campaign = Campaign.load(campaignKey)
   if (campaign) {
     campaign.rewardsLeft = campaign.rewardsLeft.minus(event.params.tokensRewarded)
     campaign.participantCount = campaign.participantCount.plus(BigInt.fromI32(1))
     campaign.save()
+  }
+
+  // create UserCampaign entity
+  let userCampaign = UserCampaign.load(userCampaignKey)
+  if (!userCampaign) {
+    userCampaign = new UserCampaign(userCampaignKey)
+    userCampaign.user = userKey
+    userCampaign.campaign = campaignKey
   }
 
   user.save()

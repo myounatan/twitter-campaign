@@ -10,10 +10,10 @@ type Data = {
   error?: string;
 };
 
-const signAuthMessage = async (wallet: string): Promise<string> => {
+const signAuthMessage = async (wallet: string, twitterUserId: any): Promise<string> => {
   const { signer } = await getBackendProviderSigner();
 
-  const signature = await signer.signMessage(wallet);
+  const signature = await signer.signMessage(`${wallet}-${twitterUserId}`);
   console.log("signAuthMessage", signature)
 
   return signature;
@@ -38,17 +38,19 @@ export const getBackendProviderSigner = async () => {
   return { provider, signer };
 }
 
-export const verifyAuthMessage = async (wallet: string, signature: string): Promise<boolean> => {
+export const verifyAuthMessage = async (wallet: string, twitterUserId: any, signature: string): Promise<boolean> => {
   const { signer } = await getBackendProviderSigner();
 
   console.log("verifyAuthMessage.signature", signature)
   console.log("verifyAuthMessage.wallet", wallet)
+  console.log("verifyAuthMessage.twitterUserId", twitterUserId)
   console.log("signer", await signer.getAddress())
 
   const signerAddress = await signer.getAddress();
 
-  //const recoveredAddress = ethers.utils.verifyMessage(wallet, signature);
-  const msgHash = ethers.utils.hashMessage(wallet);
+  const message = `${wallet}-${twitterUserId}`;
+
+  const msgHash = ethers.utils.hashMessage(message);
   const msgHashBytes = ethers.utils.arrayify(msgHash);
 
   // Now you have the digest,
@@ -57,7 +59,7 @@ export const verifyAuthMessage = async (wallet: string, signature: string): Prom
 
   const matches = signerAddress === recoveredAddress
 
-  console.log('Was Authorized signature: ', matches ? '✅' : '❌');
+  console.log('Is Authorized signature: ', matches ? '✅' : '❌');
 
   return matches;
 }
@@ -77,8 +79,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
       // sign a message with the user wallet
       const wallet = req.body.wallet;
+      const twitterUserId = req.body.twitterUserId;
 
-      const signature = await signAuthMessage(wallet);
+      const signature = await signAuthMessage(wallet, twitterUserId);
 
       res.status(200).json({ name: "Validation Success", signature: signature });
     } else {

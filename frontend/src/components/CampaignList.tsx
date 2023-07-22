@@ -130,7 +130,7 @@ export default function CampaignList() {
         "Content-Type": "application/json",
         Authorization: "Bearer " + account.idToken,
       },
-      body: JSON.stringify({ signature: signature, tweetId: tweetId, campaignId: campaignId, wallet: account.wallet }),
+      body: JSON.stringify({ signature: signature, twitterUserId: account.twitterUserId, tweetId: tweetId, campaignId: campaignId, wallet: account.wallet }),
     });
 
     console.log(res)

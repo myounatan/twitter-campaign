@@ -1,4 +1,4 @@
-type Campaign @entity(immutable: true) {
+type Campaign @entity(immutable: false) {
   id: Bytes!
 
   campaignId: BigInt! # uint256
@@ -35,7 +35,7 @@ type RewardLog @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type User @entity(immutable: true) {
+type User @entity(immutable: false) {
   id: Bytes!
 
   wallet: Bytes! # address

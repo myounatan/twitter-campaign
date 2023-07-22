@@ -24,8 +24,9 @@ export default async function handler(
   const body = req.body;
   const signature = body.signature;
   const wallet = body.wallet;
+  const twitterUserId = body.twitterUserId;
 
-  const validSignature = await verifyAuthMessage(wallet, signature);
+  const validSignature = await verifyAuthMessage(wallet, twitterUserId, signature);
   if (!validSignature) {
     res.status(401).json({ error: 'Invalid signature' })
     return;
@@ -44,7 +45,7 @@ export default async function handler(
     const response = await fetch(url, {headers: {'Authorization': `Bearer ${bearerToken}`}});
     
     /*
-    returns smthn like:
+    returns:
 
     {
       "data": {
