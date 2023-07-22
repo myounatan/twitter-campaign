@@ -308,6 +308,7 @@ export default function CampaignList() {
                             {isLoggedIn ? (
                               <>
                                 <TextField
+                                  inputProps={{ style: { color: "white" } }}
                                   margin="dense"
                                   id={`tweetid-${campaign.campaignId}`}
                                   label="TweetId"

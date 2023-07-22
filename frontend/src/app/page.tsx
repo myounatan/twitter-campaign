@@ -11,7 +11,7 @@ import RewardLogList from '@/components/RewardLogList';
 export default function Home() {
   return (
     <Layout>
-      <Stack spacing={2} direction="column">
+      <Stack spacing={5} direction="column">
         <AccountSummary/>
 
         <CampaignList/>

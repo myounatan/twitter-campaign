@@ -2,6 +2,11 @@
   border-radius: 50%;
 }
 
+.appbar {
+  background: '#bfbfbf';
+  font-family: var(--font-mono);
+}
+
 .main {
   display: flex;
   flex-direction: column;

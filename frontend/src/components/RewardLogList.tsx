@@ -83,7 +83,7 @@ export default function RewardLogList() {
             
             <div>
                 {rewardLogs.map((log: RewardLog) => (
-                  <Grid item key={log.id} className={styles.card}>
+                  <Grid item key={log.id} marginBottom={1} className={styles.card}>
                       <div>
                         <Stack spacing={2} direction="column">
                         <p>

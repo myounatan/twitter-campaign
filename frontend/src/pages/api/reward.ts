@@ -37,7 +37,6 @@ export default async function handler(
 
   const bearerToken = process.env.TWITTER_BEARER_TOKEN;
   const url = `https://api.twitter.com/2/tweets/${tweetId}?tweet.fields=public_metrics`;
-  const headers = []
 
   console.log('tweet reward url', url)
 
