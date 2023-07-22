@@ -6,7 +6,7 @@ dataSources:
     name: CampaignManager
     network: mumbai
     source:
-      address: '0x425E9E63bc1cEfd37e1E3041F9E8193Ad265eF18'
+      address: '0x19Bd7059A389103058968e4844f48Eb533f1856a'
       abi: CampaignManager
       startBlock: 38180413
     mapping:

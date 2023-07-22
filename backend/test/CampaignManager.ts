@@ -23,7 +23,7 @@ describe("CampaignManager", function () {
   it("should deploy campaign manager and execute functions properly", async function () {
     const { backendAdmin, campaignManager, owner, account1 } = await loadFixture(deployOneYearLockFixture);
 
-    const campaignId = 0;
+    const campaignId = 1;
     const tweetId = 12345;
     const tweetInfo = [1, 1];
 

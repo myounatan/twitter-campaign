@@ -94,7 +94,7 @@ contract CampaignManager is Ownable, ReentrancyGuard {
     }
 
     modifier campaignExists(uint256 _campaignId) {
-        if (_campaignId >= campaignCount) revert CampaignDoesNotExist();
+        if (_campaignId > campaignCount) revert CampaignDoesNotExist();
         _;
     }
 
@@ -276,7 +276,10 @@ contract CampaignManager is Ownable, ReentrancyGuard {
         campaign.totalRewardsGiven += tokensRewarded;
 
         // update tweet info
-        campaign.lastTweetInfoRewarded[_tweetId] = _currentTweetInfo;
+        campaign.lastTweetInfoRewarded[_tweetId].likes = _currentTweetInfo
+            .likes;
+        campaign.lastTweetInfoRewarded[_tweetId].retweets = _currentTweetInfo
+            .retweets;
 
         // update user state
         campaign.rewardsGiven[participant] += tokensRewarded;

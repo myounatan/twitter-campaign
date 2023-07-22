@@ -14,50 +14,6 @@ import { GET_CAMPAIGNS, queryApollo } from '@/services/graphql.service';
 import { ethers, BigNumber } from 'ethers';
 import { setSyntheticTrailingComments } from 'typescript';
 
-const CAMPAIGN_MANAGER_ADDRESS = '0x425E9E63bc1cEfd37e1E3041F9E8193Ad265eF18'
-const CAMPAIGN_MANAGER_ABI = `
-[
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "_name",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_description",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "_tweetString",
-        "type": "string"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_tokensPerLike",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_tokensPerRetweet",
-        "type": "uint256"
-      }
-    ],
-    "name": "createCampaignNative",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "payable",
-    "type": "function"
-  }
-]`;
-
 const chains = [
   {
     value: 'mumbai',
@@ -127,15 +83,18 @@ export default function CampaignList() {
   // };
 
   const createCampaign = async () => {
-    // if (process.env.CAMPAIGN_MANAGER_ADDRESS === undefined) {
-    //   throw new Error('CAMPAIGN_MANAGER_ADDRESS not set');
-    // }
+    if (process.env.NEXT_PUBLIC_CAMPAIGN_MANAGER_ADDRESS === undefined) {
+      throw new Error('NEXT_PUBLIC_CAMPAIGN_MANAGER_ADDRESS not set');
+    }
+    if (process.env.NEXT_PUBLIC_CAMPAIGN_MANAGER_ABI === undefined) {
+      throw new Error('NEXT_PUBLIC_CAMPAIGN_MANAGER_ABI not set');
+    }
 
     console.log('creating campaign')
 
     setCreatingCampaign(true);
 
-    const campaignManagerContract = new ethers.Contract(CAMPAIGN_MANAGER_ADDRESS, CAMPAIGN_MANAGER_ABI, signer);
+    const campaignManagerContract = new ethers.Contract(process.env.NEXT_PUBLIC_CAMPAIGN_MANAGER_ADDRESS, process.env.NEXT_PUBLIC_CAMPAIGN_MANAGER_ABI, signer);
 
     // create campaign
     const tx = await campaignManagerContract.createCampaignNative(
