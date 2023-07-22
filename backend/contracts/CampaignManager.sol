@@ -216,12 +216,13 @@ contract CampaignManager is Ownable, ReentrancyGuard {
         if (likesRewarded == 0 && retweetsRewarded == 0)
             revert NoRewardToClaim();
 
-        // calulated in wei
-        tokensRewarded =
-            likesRewarded *
-            _tweetRewardStats.tokensPerLike +
-            retweetsRewarded *
-            _tweetRewardStats.tokensPerRetweet;
+        if (likesRewarded > 0)
+            tokensRewarded = likesRewarded * _tweetRewardStats.tokensPerLike;
+
+        if (retweetsRewarded > 0)
+            tokensRewarded +=
+                retweetsRewarded *
+                _tweetRewardStats.tokensPerRetweet;
     }
 
     // public onlyCampaignOwner

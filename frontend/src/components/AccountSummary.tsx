@@ -18,7 +18,7 @@ export default function AccountSummary() {
               ACCOUNT SUMMARY
             </div>
             <p>
-              {loadingLogin ? 'Loading..' : 'Please log in to view account summary'}
+              {loadingLogin ? 'Loading..' : 'Log in to view account summary'}
             </p>
           </Stack>
         </div>

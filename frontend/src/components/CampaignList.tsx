@@ -158,7 +158,7 @@ export default function CampaignList() {
                 </Button>
               ) : (
                 <p>
-                  {loadingLogin ? 'Loading..' : 'Please log in to create a campaign'}
+                  {loadingLogin ? 'Loading..' : 'Log in to create a campaign'}
                 </p>
               )}
             </Stack>
