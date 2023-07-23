@@ -23,7 +23,9 @@ type Lookup = {
   [key: string]: string;
 }
 const TWEET_ID_TO_AUTHOR_HANDLE: Lookup = {
-  '1682751937945513987': 'cryptowesties'
+  '1682751937945513987': 'cryptowesties',
+  '1682950064732340225': 'cryptowesties',
+  '1682951670064447488': 'cryptowesties',
 };
 
 const TWITTER_USER_ID_TO_HANDLE: Lookup = {
@@ -59,7 +61,7 @@ const UserProvider: React.FC<Props> = ({ children }) => {
   }
 
   const getTwitterHandleFromId = cache(async (twitterUserId: string) => {
-    console.log(`found pre cache? ${twitterUserId} in ${TWITTER_USER_ID_TO_HANDLE[twitterUserId]}`)
+    console.log(`found pre cache? getTwitterHandleFromId ${twitterUserId} in ${TWITTER_USER_ID_TO_HANDLE[twitterUserId]}`)
     if (TWITTER_USER_ID_TO_HANDLE[twitterUserId] !== undefined) {
       return TWITTER_USER_ID_TO_HANDLE[twitterUserId];
     }
@@ -82,7 +84,7 @@ const UserProvider: React.FC<Props> = ({ children }) => {
   });
   
   const getTweetAuthorTwitterHandle = cache(async (tweetId: number) => {
-    console.log(`found pre cache? ${`${tweetId}`} in ${TWEET_ID_TO_AUTHOR_HANDLE[`${tweetId}`]}`)
+    console.log(`found pre cache? getTweetAuthorTwitterHandle ${`${tweetId}`} in ${TWEET_ID_TO_AUTHOR_HANDLE[`${tweetId}`]}`)
     if (TWEET_ID_TO_AUTHOR_HANDLE[`${tweetId}`] !== undefined) {
       return TWEET_ID_TO_AUTHOR_HANDLE[`${tweetId}`];
     }

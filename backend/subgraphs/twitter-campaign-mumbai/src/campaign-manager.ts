@@ -79,12 +79,12 @@ export function handleRewardClaimed(event: RewardClaimedEvent): void {
   }
 
   // create UserCampaign entity
-  let userCampaign = UserCampaign.load(userCampaignKey)
-  if (!userCampaign) {
-    userCampaign = new UserCampaign(userCampaignKey)
-    userCampaign.user = userKey
-    userCampaign.campaign = campaignKey
-  }
+  // let userCampaign = UserCampaign.load(userCampaignKey)
+  // if (!userCampaign) {
+  //   userCampaign = new UserCampaign(userCampaignKey)
+  //   userCampaign.user = userKey
+  //   userCampaign.campaign = campaignKey
+  // }
 
   user.save()
   entity.save()

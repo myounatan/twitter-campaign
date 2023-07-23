@@ -2,7 +2,7 @@
   "mumbai": {
     "CampaignManager": {
       "address": "0x75a17a3e049ae3330a9aE242c86D7296665424b2",
-      "startBlock": 38212198
+      "startBlock": 38210198
     }
   }
 }

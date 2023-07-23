@@ -8,14 +8,14 @@ import { useCallback, useContext, useEffect, useState } from 'react';
 
 // campaign type
 import { GET_SORTED_REWARDLOGS, queryApollo } from '@/services/graphql.service';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { RewardLog } from '@/types/rewardLog';
 import { UserContext } from '@/context/userContext';
 import { UserContextType } from '@/types/user';
 
 
 export default function RewardLogList() {
-  const { getTweetAuthorTwitterHandle } = useContext(UserContext) as UserContextType;
+  const { getTweetAuthorTwitterHandle, convertMaticUSD } = useContext(UserContext) as UserContextType;
 
   const [rewardLogs, setRewardLogs] = useState<[RewardLog] | []>([]);
 
@@ -33,12 +33,11 @@ export default function RewardLogList() {
 
     const mapped = await Promise.all<[RewardLog]>(data.rewardLogs.map(async (rewardLog: RewardLog) => {
       const twitterHandle = await getTweetAuthorTwitterHandle(rewardLog.tweetId);
-      const tokensRewarded = ethers.utils.formatEther(rewardLog.tokensRewarded);
 
       return {
         ...rewardLog,
-        twitterHandle: `@${twitterHandle}`,
-        tokensRewarded: tokensRewarded
+        twitterHandle: `${twitterHandle}`,
+        tokensRewardedFormatted: ethers.utils.formatEther(rewardLog.tokensRewarded)
       }
     }))
 
@@ -49,8 +48,13 @@ export default function RewardLogList() {
   
   useEffect(() => {
     fetchData()
-      .catch(console.error);;
+      .catch(console.error);
   }, [fetchData])
+  
+  useEffect(() => {
+    fetchData()
+      .catch(console.error);
+  }, [])
 
   useEffect(() => {
     const interval = setInterval(() => setRefreshTime(Date.now()), 30000);
@@ -84,7 +88,7 @@ export default function RewardLogList() {
                           </code>
                         </p>
                         <h3>
-                          {log.tokensRewarded}
+                          {`${convertMaticUSD(BigNumber.from(log.tokensRewarded).toNumber())} (${log.tokensRewardedFormatted} MATIC)`}
                         </h3>
                         </Stack>
                       </div>

@@ -5,6 +5,7 @@ export type RewardLog = {
   twitterHandle?: string
   tweetId: number
   tokensRewarded: number
+  tokensRewardedFormatted: string
   campaign: {
     campaignId: string
   }
