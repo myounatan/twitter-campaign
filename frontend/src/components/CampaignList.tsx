@@ -473,9 +473,9 @@ export default function CampaignList() {
             </Dialog>
 
             <>
-              <Stack spacing={0} direction="row" className={styles.grid}>
+              <Stack spacing={0} direction="row">
                 {campaigns.map((campaign: Campaign) => (
-                  <Grid item key={campaign.campaignId} marginRight={2} marginBottom={2} sx={{ display: 'flex' }}>
+                  <Grid item key={campaign.campaignId} marginRight={2} marginBottom={2}>
                       <div className={styles.card}>
                         <Stack spacing={2} direction="column">
                           <Stack spacing={0} direction="column">
