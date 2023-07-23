@@ -9,7 +9,8 @@ import {
   UserCampaign
 } from "../generated/schema"
 
-import { Bytes, BigInt } from '@graphprotocol/graph-ts'
+import { Bytes, BigInt, log } from '@graphprotocol/graph-ts'
+
 
 export function handleCampaignCreated(event: CampaignCreatedEvent): void {
   let entity = new Campaign(
@@ -35,6 +36,9 @@ export function handleCampaignCreated(event: CampaignCreatedEvent): void {
 }
 
 export function handleRewardClaimed(event: RewardClaimedEvent): void {
+  //log.warning('Processing RewardClaimedEvent: ', [event.transaction.hash.toHex()]);
+
+
   let entity = new RewardLog(
     event.transaction.hash
   )

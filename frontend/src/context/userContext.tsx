@@ -7,7 +7,7 @@ import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
 import { Web3AuthOptions } from "@web3auth/modal";
 
 import Transak from "@biconomy/transak";
-import { ethers } from "ethers";
+import { BigNumber, ethers } from "ethers";
 
 import { cache } from 'react'
 
@@ -18,15 +18,16 @@ interface Props {
   children: React.ReactNode;
 }
 
+// this lookup table is only here to save twitter api calls when testing
 type Lookup = {
   [key: string]: string;
 }
 const TWEET_ID_TO_AUTHOR_HANDLE: Lookup = {
-  '1682751937945513987': '@cryptowesties'
+  '1682751937945513987': 'cryptowesties'
 };
 
 const TWITTER_USER_ID_TO_HANDLE: Lookup = {
-  '1371511387021791234': '@cryptowesties'
+  '1371511387021791234': 'cryptowesties'
 }
 
 const UserProvider: React.FC<Props> = ({ children }) => {
@@ -43,6 +44,19 @@ const UserProvider: React.FC<Props> = ({ children }) => {
   const [loadingLogin, setLoadingLogin] = useState(false);
 
   const [signature, setSignature] = useState<string | null>(null);
+
+  const [maticUSDPrice, setMaticUSDPrice] = useState<number | null>(null);
+
+  const convertMaticUSD = (matic: number): string => {
+    if (!maticUSDPrice) {
+      return '';
+    }
+
+    const formatted = ethers.utils.formatEther(matic);
+    const formattedLength = Math.min(formatted.length + 2, 8);
+
+    return `$${(parseFloat(formatted) * maticUSDPrice).toFixed(formattedLength)} USD`;
+  }
 
   const getTwitterHandleFromId = cache(async (twitterUserId: string) => {
     console.log(`found pre cache? ${twitterUserId} in ${TWITTER_USER_ID_TO_HANDLE[twitterUserId]}`)
@@ -90,6 +104,23 @@ const UserProvider: React.FC<Props> = ({ children }) => {
       throw new Error('no twitter handle');
     }
   });
+
+  const updateBalance = async () => {
+    if (!provider || !signer) {
+      throw new Error('no provider or signer');
+    }
+    if (!account) {
+      throw new Error('no account');
+    }
+
+    const balance = await signer.getBalance();
+    const parsedBalance = ethers.utils.formatEther(balance);
+
+    setAccount({
+      ...account,
+      balance: parsedBalance
+    });
+  }
 
   const options: Web3AuthOptions = {
     clientId: 'BEicrlVSViTgfhBz3NNpCdSG48IGS9-Xf0WD6c7zvrhRtZn9d1WUaC8SJdwbgWWXYixDKITd4IXwmAEoJwBU-Vo',
@@ -208,6 +239,16 @@ const UserProvider: React.FC<Props> = ({ children }) => {
 
     setTransak(transakClient);
 
+    // fetch matic usd price using https://api.polygonscan.com/api?module=stats&action=maticprice&apikey=R3FPMSEVMGYMNGJ9Q9CDJGU1UQS5X4JMD5
+    try {
+      const res = await fetch('https://api.polygonscan.com/api?module=stats&action=maticprice&apikey=R3FPMSEVMGYMNGJ9Q9CDJGU1UQS5X4JMD5');
+      const data = await res.json();
+      console.log(data);
+      setMaticUSDPrice(parseFloat(data.result.maticusd));
+    } catch (e) {
+      console.log(e);
+    }
+
     // parse the idToken from the user object
     if (idToken) {
       // Taken from: https://web3auth.io/docs/content-hub/guides/server-side-verification
@@ -261,7 +302,7 @@ const UserProvider: React.FC<Props> = ({ children }) => {
   }
 
   return (
-    <UserContext.Provider value={{ account, signature, loginState, provider, signer, transak, isLoggedIn, loadingLogin, login, logout, fundTransak, getTweetAuthorTwitterHandle, getTwitterHandleFromId }}>
+    <UserContext.Provider value={{ account, signature, loginState, provider, signer, transak, isLoggedIn, loadingLogin, convertMaticUSD, login, logout, fundTransak, getTweetAuthorTwitterHandle, getTwitterHandleFromId, updateBalance }}>
       {children}
     </UserContext.Provider>
   );

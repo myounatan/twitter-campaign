@@ -5,9 +5,10 @@ import { Box, Button, Stack } from '@mui/material';
 import { UserContext } from '@/context/userContext';
 import { UserContextType } from '@/types/user';
 import { useContext } from 'react';
+import { ethers } from 'ethers';
 
 export default function AccountSummary() {
-  const { account, loadingLogin, isLoggedIn, fundTransak } = useContext(UserContext) as UserContextType;
+  const { account, loadingLogin, isLoggedIn, fundTransak, convertMaticUSD } = useContext(UserContext) as UserContextType;
 
   if (!isLoggedIn) {
     return (
@@ -40,8 +41,7 @@ export default function AccountSummary() {
               </p>
               <p>
                 Balance&nbsp;
-                <code className={styles.code}>{account?.balance}</code>
-                &nbsp;MATIC
+                <code className={styles.code}>{`$${convertMaticUSD(ethers.utils.parseEther(account?.balance || '0'))} (${account?.balance} MATIC)`}</code>
               </p>
               {isLoggedIn && (
                 <Button variant="outlined" color="inherit" onClick={fundTransak}>

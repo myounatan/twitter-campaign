@@ -36,10 +36,14 @@ export type UserContextType = {
   isLoggedIn: boolean;
   loadingLogin: boolean;
 
+  convertMaticUSD: (maticAny: string | number | BigNumber) => string;
+
   login: () => void;
   logout: () => void;
 
   fundTransak: () => void;
+
+  updateBalance: () => void;
 
   getTweetAuthorTwitterHandle: any;
   getTwitterHandleFromId: any;

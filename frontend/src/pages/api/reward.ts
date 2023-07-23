@@ -8,6 +8,7 @@ import { verifyAuthMessage } from './auth';
 
 type Data = {
   hash?: string
+  reward?: string
   error?: string
 }
 
@@ -36,7 +37,7 @@ export default async function handler(
   const campaignId = body.campaignId;
 
   const bearerToken = process.env.TWITTER_BEARER_TOKEN;
-  const url = `https://api.twitter.com/2/tweets/${tweetId}?tweet.fields=public_metrics`;
+  const url = `https://api.twitter.com/2/tweets/${tweetId}?tweet.fields=public_metrics&expansions=author_id`;
 
   console.log('tweet reward url', url)
 
@@ -94,11 +95,24 @@ export default async function handler(
     // get campaign info
     const campaignInfo = await campaignManagerContract.getCampaignInfo(parseInt(campaignId));
 
+    if (tweet.author_id !== twitterUserId.toString()) {
+      res.status(400).json({ error: 'Tweet author does not match user' })
+      return;
+    }
+
     // check data.text contains tweetString
     if (!tweet.text.includes(campaignInfo.tweetString)) {
       res.status(400).json({ error: `Tweet does not contain the correct tweet string (${campaignInfo.tweetString})` })
       return;
     }
+
+    // last rewards via rewardsGiven
+    const lastTweetInfoRewarded = await campaignManagerContract.lastTweetInfoRewarded(campaignId, tweetId);
+    console.log('lastTweetInfoRewarded', lastTweetInfoRewarded)
+
+    // read contract to calculate reward
+    const possibleReward: any = await campaignManagerContract.calculateRewards([lastTweetInfoRewarded.likes, lastTweetInfoRewarded.retweets], [likeCount, retweetCount], [campaignInfo.tweetRewardStats.tokensPerLike, campaignInfo.tweetRewardStats.tokensPerRetweet]);
+    console.log('possibleReward', possibleReward)
 
     console.log('\ncalling claimRewardNativeTo')
     console.log('tweetId', tweetId, parseInt(tweetId))
@@ -106,7 +120,9 @@ export default async function handler(
     console.log('wallet', wallet)
     const tx = await campaignManagerContract.claimRewardNativeTo(wallet, campaignId, tweetId, [likeCount, retweetCount]);
 
-    res.status(200).json({ hash: tx.hash })
+    const rewardFormatted = ethers.utils.formatEther(possibleReward.tokensRewarded.toString());
+
+    res.status(200).json({ hash: tx.hash, reward: rewardFormatted })
   } catch (error: any) {
     console.log(error);
     res.status(500).json({ error: error.message });

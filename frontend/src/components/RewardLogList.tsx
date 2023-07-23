@@ -37,7 +37,7 @@ export default function RewardLogList() {
 
       return {
         ...rewardLog,
-        twitterHandle: twitterHandle,
+        twitterHandle: `@${twitterHandle}`,
         tokensRewarded: tokensRewarded
       }
     }))
