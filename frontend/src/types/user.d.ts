@@ -40,4 +40,7 @@ export type UserContextType = {
   logout: () => void;
 
   fundTransak: () => void;
+
+  getTweetAuthorTwitterHandle: any;
+  getTwitterHandleFromId: any;
 };

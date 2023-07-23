@@ -36,19 +36,19 @@ describe("CampaignManager", function () {
     const tokensPerRetweet = CONVERT_WEI(0.02);
 
     // create campaign
-    await campaignManager.createCampaignNative(campaignName, campaignDescription, tweetString, tokensPerLike, tokensPerRetweet, { value: totalRewards });
+    await campaignManager.createCampaignNative(campaignName, campaignDescription, tweetString, tokensPerLike, tokensPerRetweet, 0, { value: totalRewards });
 
     // get campaign
     {
-      let [campaignName1, campaignDescription1, tweetString1, tokensPerLike1, tokensPerRetweet1, rewardsLeft] = await campaignManager.getCampaignInfo(campaignId);
+      let campaignInfo = await campaignManager.getCampaignInfo(campaignId);
 
       // expect campaign to be correct
-      expect(campaignName1).to.equal(campaignName);
-      expect(campaignDescription1).to.equal(campaignDescription);
-      expect(tweetString1).to.equal(tweetString);
-      expect(tokensPerLike1).to.equal(tokensPerLike);
-      expect(tokensPerRetweet1).to.equal(tokensPerRetweet);
-      expect(rewardsLeft).to.equal(totalRewards);
+      expect(campaignInfo.name).to.equal(campaignName);
+      expect(campaignInfo.description).to.equal(campaignDescription);
+      expect(campaignInfo.tweetString).to.equal(tweetString);
+      expect(campaignInfo.tweetRewardStats.tokensPerLike).to.equal(tokensPerLike);
+      expect(campaignInfo.tweetRewardStats.tokensPerRetweet).to.equal(tokensPerRetweet);
+      expect(campaignInfo.rewardsLeft).to.equal(totalRewards);
     }
 
     // pre calculate rewards
@@ -58,10 +58,10 @@ describe("CampaignManager", function () {
     await expect(campaignManager.claimRewardNativeTo(account1.address, campaignId, tweetId, tweetInfo)).to.emit(campaignManager, 'RewardClaimed').withArgs(campaignId, account1.address, tweetId, tokensRewarded, likesRewarded, retweetsRewarded);
   
     {
-      let [campaignName1, campaignDescription1, tweetString1, tokensPerLike1, tokensPerRetweet1, rewardsLeft] = await campaignManager.getCampaignInfo(campaignId);
+      let campaignInfo = await campaignManager.getCampaignInfo(campaignId);
       
       // expect rewards to be deducted
-      expect(rewardsLeft).to.equal(totalRewards.sub(tokensRewarded));
+      expect(campaignInfo.rewardsLeft).to.equal(totalRewards.sub(tokensRewarded));
     }
   });
 });

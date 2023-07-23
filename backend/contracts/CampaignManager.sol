@@ -31,8 +31,13 @@ contract CampaignManager is Ownable, ReentrancyGuard {
         address tokenAddress;
     }
 
-    struct Campaign {
+    struct CampaignOwnerInfo {
         address owner;
+        uint256 twitterUserId;
+    }
+
+    struct Campaign {
+        CampaignOwnerInfo ownerInfo;
         // general info
         string name;
         string description;
@@ -43,9 +48,11 @@ contract CampaignManager is Ownable, ReentrancyGuard {
         uint256 rewardsLeft;
         uint256 totalRewardsGiven;
         RewardToken rewardToken;
-        mapping(address => uint256) rewardsGiven; // per wallet
-        mapping(uint256 => TweetInfo) lastTweetInfoRewarded; // per tweet
     }
+
+    mapping(uint256 => mapping(address => uint256)) public rewardsGiven;
+    mapping(uint256 => mapping(uint256 => TweetInfo))
+        public lastTweetInfoRewarded;
 
     // state variables
 
@@ -64,7 +71,8 @@ contract CampaignManager is Ownable, ReentrancyGuard {
         string tweetString,
         uint256 tokensPerLike,
         uint256 tokensPerRetweet,
-        uint256 rewardsLeft
+        uint256 rewardsLeft,
+        uint256 creatorTwitterUserId
     );
 
     event RewardClaimed(
@@ -104,7 +112,7 @@ contract CampaignManager is Ownable, ReentrancyGuard {
     }
 
     modifier onlyCampaignOwner(uint256 _campaignId) {
-        if (msg.sender != campaigns[_campaignId].owner)
+        if (msg.sender != campaigns[_campaignId].ownerInfo.owner)
             revert OnlyCampaignOwner();
         _;
     }
@@ -119,27 +127,8 @@ contract CampaignManager is Ownable, ReentrancyGuard {
 
     function getCampaignInfo(
         uint256 _campaignId
-    )
-        public
-        view
-        campaignExists(_campaignId)
-        returns (
-            string memory,
-            string memory,
-            string memory,
-            uint256,
-            uint256,
-            uint256
-        )
-    {
-        return (
-            campaigns[_campaignId].name,
-            campaigns[_campaignId].description,
-            campaigns[_campaignId].tweetString,
-            campaigns[_campaignId].tweetRewardStats.tokensPerLike,
-            campaigns[_campaignId].tweetRewardStats.tokensPerRetweet,
-            campaigns[_campaignId].rewardsLeft
-        );
+    ) public view campaignExists(_campaignId) returns (Campaign memory) {
+        return campaigns[_campaignId];
     }
 
     // creates a campaign with reward token as the native
@@ -148,28 +137,32 @@ contract CampaignManager is Ownable, ReentrancyGuard {
         string memory _description,
         string memory _tweetString,
         uint256 _tokensPerLike,
-        uint256 _tokensPerRetweet
+        uint256 _tokensPerRetweet,
+        uint256 _ownerTwitterUserId
     ) public payable nonReentrant nonZeroAmount(msg.value) returns (uint256) {
-        uint256 rewardsLeft = msg.value;
-
         campaignCount++;
 
-        campaigns[campaignCount].owner = msg.sender;
-        campaigns[campaignCount].name = _name;
-        campaigns[campaignCount].description = _description;
+        {
+            Campaign storage campaign = campaigns[campaignCount];
 
-        campaigns[campaignCount].tweetString = _tweetString;
+            campaign.ownerInfo = CampaignOwnerInfo({
+                owner: msg.sender,
+                twitterUserId: _ownerTwitterUserId
+            });
 
-        campaigns[campaignCount]
-            .tweetRewardStats
-            .tokensPerLike = _tokensPerLike;
+            campaign.name = _name;
+            campaign.description = _description;
 
-        campaigns[campaignCount]
-            .tweetRewardStats
-            .tokensPerRetweet = _tokensPerRetweet;
+            campaign.tweetString = _tweetString;
 
-        campaigns[campaignCount].rewardsLeft = rewardsLeft;
-        campaigns[campaignCount].rewardToken.rewardType = RewardType.NATIVE;
+            campaign.tweetRewardStats = TweetRewardStats({
+                tokensPerLike: _tokensPerLike,
+                tokensPerRetweet: _tokensPerRetweet
+            });
+
+            campaign.rewardsLeft = msg.value;
+            campaign.rewardToken.rewardType = RewardType.NATIVE;
+        }
 
         emit CampaignCreated(
             campaignCount,
@@ -179,7 +172,8 @@ contract CampaignManager is Ownable, ReentrancyGuard {
             _tweetString,
             _tokensPerLike,
             _tokensPerRetweet,
-            rewardsLeft
+            msg.value,
+            _ownerTwitterUserId
         );
 
         return campaignCount;
@@ -263,7 +257,7 @@ contract CampaignManager is Ownable, ReentrancyGuard {
             uint256 likesRewarded,
             uint256 retweetsRewarded
         ) = calculateRewards(
-                campaign.lastTweetInfoRewarded[_tweetId],
+                lastTweetInfoRewarded[_campaignId][_tweetId],
                 _currentTweetInfo,
                 campaign.tweetRewardStats
             );
@@ -277,13 +271,13 @@ contract CampaignManager is Ownable, ReentrancyGuard {
         campaign.totalRewardsGiven += tokensRewarded;
 
         // update tweet info
-        campaign.lastTweetInfoRewarded[_tweetId].likes = _currentTweetInfo
+        lastTweetInfoRewarded[_campaignId][_tweetId].likes = _currentTweetInfo
             .likes;
-        campaign.lastTweetInfoRewarded[_tweetId].retweets = _currentTweetInfo
-            .retweets;
+        lastTweetInfoRewarded[_campaignId][_tweetId]
+            .retweets = _currentTweetInfo.retweets;
 
         // update user state
-        campaign.rewardsGiven[participant] += tokensRewarded;
+        rewardsGiven[_campaignId][participant] += tokensRewarded;
 
         // send tokens to user
         (bool success, ) = payable(participant).call{value: tokensRewarded}("");

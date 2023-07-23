@@ -3,6 +3,7 @@ type Campaign @entity(immutable: false) {
 
   campaignId: BigInt! # uint256
   owner: Bytes! # address
+  ownerTwitterUserId: BigInt! # uint256
   name: String! # string
   description: String! # string
   tweetString: String! # string

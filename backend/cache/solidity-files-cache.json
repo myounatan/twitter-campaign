@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/home/matthew/Projects/EthGlobal/twitter-campaign/backend/contracts/CampaignManager.sol": {
-      "lastModificationDate": 1690067522884,
-      "contentHash": "e6f047b103a71676eba053631316709e",
+      "lastModificationDate": 1690074343121,
+      "contentHash": "6ea43dc4ff7d32e8021d1ae126b9ca4f",
       "sourceName": "contracts/CampaignManager.sol",
       "solcConfig": {
         "version": "0.8.18",

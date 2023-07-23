@@ -10,7 +10,11 @@ const client = new ApolloClient({
 })
 
 export async function queryApollo(query: DocumentNode, variables?: any) {
-  return (await client.query({ query: query, variables: variables })).data
+  const data = (await client.query({ query: query, variables: variables })).data
+
+  client.resetStore()
+
+  return data;
 }
 
 // helper queries
@@ -20,6 +24,8 @@ export const GET_CAMPAIGNS = gql(`
       campaignId
 
       owner
+      ownerTwitterUserId
+      
       name
       description 
       tweetString

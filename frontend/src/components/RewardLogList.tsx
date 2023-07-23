@@ -3,40 +3,23 @@
 import 'dotenv/config';
 
 import styles from '../app/page.module.css';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, InputLabel, MenuItem, Select, Stack, TextField } from '@mui/material';
+import { Grid, Stack } from '@mui/material';
 import { useCallback, useContext, useEffect, useState } from 'react';
 
 // campaign type
 import { GET_SORTED_REWARDLOGS, queryApollo } from '@/services/graphql.service';
-import { ethers, BigNumber } from 'ethers';
-import { setSyntheticTrailingComments } from 'typescript';
+import { ethers } from 'ethers';
 import { RewardLog } from '@/types/rewardLog';
-
-
-const getTweetAuthorTwitterHandle = async (tweetId: number) => {
-  const res = await fetch('/api/tweetauthor', {
-    method: 'POST',
-    body: JSON.stringify({ tweetId: `${tweetId}` }),
-  });
-
-  console.log(res)
-
-  if (res.status === 200) {
-    const data = await res.json();
-    console.log(`Received twitter handle ${data.twitterHandle}`);
-    console.log(`Received twitter user id ${data.twitterUserId}`);
-
-    return data.twitterHandle;
-  } else {
-    throw new Error('no twitter handle');
-  }
-}
+import { UserContext } from '@/context/userContext';
+import { UserContextType } from '@/types/user';
 
 
 export default function RewardLogList() {
+  const { getTweetAuthorTwitterHandle } = useContext(UserContext) as UserContextType;
 
   const [rewardLogs, setRewardLogs] = useState<[RewardLog] | []>([]);
 
+  const [refreshTime, setRefreshTime] = useState(Date.now());
 
   // use graphql.service to get campaigns
   const fetchData = useCallback(async () => {
@@ -62,14 +45,19 @@ export default function RewardLogList() {
     console.log('mapped', mapped)
 
     setRewardLogs(mapped);
-  }, [])
+  }, [refreshTime])
   
   useEffect(() => {
     fetchData()
       .catch(console.error);;
   }, [fetchData])
 
-
+  useEffect(() => {
+    const interval = setInterval(() => setRefreshTime(Date.now()), 30000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
   
 
   // map campaigns to grid items

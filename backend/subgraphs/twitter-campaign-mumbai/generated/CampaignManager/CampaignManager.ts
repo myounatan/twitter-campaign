@@ -54,6 +54,10 @@ export class CampaignCreated__Params {
   get rewardsLeft(): BigInt {
     return this._event.parameters[7].value.toBigInt();
   }
+
+  get creatorTwitterUserId(): BigInt {
+    return this._event.parameters[8].value.toBigInt();
+  }
 }
 
 export class OwnershipTransferred extends ethereum.Event {
@@ -178,6 +182,16 @@ export class CampaignManager__calculateRewardsInput_tweetRewardStatsStruct exten
   }
 }
 
+export class CampaignManager__campaignsResultOwnerInfoStruct extends ethereum.Tuple {
+  get owner(): Address {
+    return this[0].toAddress();
+  }
+
+  get twitterUserId(): BigInt {
+    return this[1].toBigInt();
+  }
+}
+
 export class CampaignManager__campaignsResultTweetRewardStatsStruct extends ethereum.Tuple {
   get tokensPerLike(): BigInt {
     return this[0].toBigInt();
@@ -199,7 +213,7 @@ export class CampaignManager__campaignsResultRewardTokenStruct extends ethereum.
 }
 
 export class CampaignManager__campaignsResult {
-  value0: Address;
+  value0: CampaignManager__campaignsResultOwnerInfoStruct;
   value1: string;
   value2: string;
   value3: string;
@@ -209,7 +223,7 @@ export class CampaignManager__campaignsResult {
   value7: CampaignManager__campaignsResultRewardTokenStruct;
 
   constructor(
-    value0: Address,
+    value0: CampaignManager__campaignsResultOwnerInfoStruct,
     value1: string,
     value2: string,
     value3: string,
@@ -230,7 +244,7 @@ export class CampaignManager__campaignsResult {
 
   toMap(): TypedMap<string, ethereum.Value> {
     let map = new TypedMap<string, ethereum.Value>();
-    map.set("value0", ethereum.Value.fromAddress(this.value0));
+    map.set("value0", ethereum.Value.fromTuple(this.value0));
     map.set("value1", ethereum.Value.fromString(this.value1));
     map.set("value2", ethereum.Value.fromString(this.value2));
     map.set("value3", ethereum.Value.fromString(this.value3));
@@ -241,7 +255,7 @@ export class CampaignManager__campaignsResult {
     return map;
   }
 
-  getOwner(): Address {
+  getOwnerInfo(): CampaignManager__campaignsResultOwnerInfoStruct {
     return this.value0;
   }
 
@@ -274,63 +288,98 @@ export class CampaignManager__campaignsResult {
   }
 }
 
-export class CampaignManager__getCampaignInfoResult {
-  value0: string;
-  value1: string;
-  value2: string;
-  value3: BigInt;
-  value4: BigInt;
-  value5: BigInt;
+export class CampaignManager__getCampaignInfoResultValue0Struct extends ethereum.Tuple {
+  get ownerInfo(): CampaignManager__getCampaignInfoResultValue0OwnerInfoStruct {
+    return changetype<
+      CampaignManager__getCampaignInfoResultValue0OwnerInfoStruct
+    >(this[0].toTuple());
+  }
 
-  constructor(
-    value0: string,
-    value1: string,
-    value2: string,
-    value3: BigInt,
-    value4: BigInt,
-    value5: BigInt
-  ) {
+  get name(): string {
+    return this[1].toString();
+  }
+
+  get description(): string {
+    return this[2].toString();
+  }
+
+  get tweetString(): string {
+    return this[3].toString();
+  }
+
+  get tweetRewardStats(): CampaignManager__getCampaignInfoResultValue0TweetRewardStatsStruct {
+    return changetype<
+      CampaignManager__getCampaignInfoResultValue0TweetRewardStatsStruct
+    >(this[4].toTuple());
+  }
+
+  get rewardsLeft(): BigInt {
+    return this[5].toBigInt();
+  }
+
+  get totalRewardsGiven(): BigInt {
+    return this[6].toBigInt();
+  }
+
+  get rewardToken(): CampaignManager__getCampaignInfoResultValue0RewardTokenStruct {
+    return changetype<
+      CampaignManager__getCampaignInfoResultValue0RewardTokenStruct
+    >(this[7].toTuple());
+  }
+}
+
+export class CampaignManager__getCampaignInfoResultValue0OwnerInfoStruct extends ethereum.Tuple {
+  get owner(): Address {
+    return this[0].toAddress();
+  }
+
+  get twitterUserId(): BigInt {
+    return this[1].toBigInt();
+  }
+}
+
+export class CampaignManager__getCampaignInfoResultValue0TweetRewardStatsStruct extends ethereum.Tuple {
+  get tokensPerLike(): BigInt {
+    return this[0].toBigInt();
+  }
+
+  get tokensPerRetweet(): BigInt {
+    return this[1].toBigInt();
+  }
+}
+
+export class CampaignManager__getCampaignInfoResultValue0RewardTokenStruct extends ethereum.Tuple {
+  get rewardType(): i32 {
+    return this[0].toI32();
+  }
+
+  get tokenAddress(): Address {
+    return this[1].toAddress();
+  }
+}
+
+export class CampaignManager__lastTweetInfoRewardedResult {
+  value0: BigInt;
+  value1: BigInt;
+
+  constructor(value0: BigInt, value1: BigInt) {
     this.value0 = value0;
     this.value1 = value1;
-    this.value2 = value2;
-    this.value3 = value3;
-    this.value4 = value4;
-    this.value5 = value5;
   }
 
   toMap(): TypedMap<string, ethereum.Value> {
     let map = new TypedMap<string, ethereum.Value>();
-    map.set("value0", ethereum.Value.fromString(this.value0));
-    map.set("value1", ethereum.Value.fromString(this.value1));
-    map.set("value2", ethereum.Value.fromString(this.value2));
-    map.set("value3", ethereum.Value.fromUnsignedBigInt(this.value3));
-    map.set("value4", ethereum.Value.fromUnsignedBigInt(this.value4));
-    map.set("value5", ethereum.Value.fromUnsignedBigInt(this.value5));
+    map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
+    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
     return map;
   }
 
-  getValue0(): string {
+  getLikes(): BigInt {
     return this.value0;
   }
 
-  getValue1(): string {
+  getRetweets(): BigInt {
     return this.value1;
-  }
-
-  getValue2(): string {
-    return this.value2;
-  }
-
-  getValue3(): BigInt {
-    return this.value3;
-  }
-
-  getValue4(): BigInt {
-    return this.value4;
-  }
-
-  getValue5(): BigInt {
-    return this.value5;
   }
 }
 
@@ -425,22 +474,26 @@ export class CampaignManager extends ethereum.SmartContract {
   campaigns(param0: BigInt): CampaignManager__campaignsResult {
     let result = super.call(
       "campaigns",
-      "campaigns(uint256):(address,string,string,string,(uint256,uint256),uint256,uint256,(uint8,address))",
+      "campaigns(uint256):((address,uint256),string,string,string,(uint256,uint256),uint256,uint256,(uint8,address))",
       [ethereum.Value.fromUnsignedBigInt(param0)]
     );
 
-    return new CampaignManager__campaignsResult(
-      result[0].toAddress(),
-      result[1].toString(),
-      result[2].toString(),
-      result[3].toString(),
-      changetype<CampaignManager__campaignsResultTweetRewardStatsStruct>(
-        result[4].toTuple()
-      ),
-      result[5].toBigInt(),
-      result[6].toBigInt(),
-      changetype<CampaignManager__campaignsResultRewardTokenStruct>(
-        result[7].toTuple()
+    return changetype<CampaignManager__campaignsResult>(
+      new CampaignManager__campaignsResult(
+        changetype<CampaignManager__campaignsResultOwnerInfoStruct>(
+          result[0].toTuple()
+        ),
+        result[1].toString(),
+        result[2].toString(),
+        result[3].toString(),
+        changetype<CampaignManager__campaignsResultTweetRewardStatsStruct>(
+          result[4].toTuple()
+        ),
+        result[5].toBigInt(),
+        result[6].toBigInt(),
+        changetype<CampaignManager__campaignsResultRewardTokenStruct>(
+          result[7].toTuple()
+        )
       )
     );
   }
@@ -450,7 +503,7 @@ export class CampaignManager extends ethereum.SmartContract {
   ): ethereum.CallResult<CampaignManager__campaignsResult> {
     let result = super.tryCall(
       "campaigns",
-      "campaigns(uint256):(address,string,string,string,(uint256,uint256),uint256,uint256,(uint8,address))",
+      "campaigns(uint256):((address,uint256),string,string,string,(uint256,uint256),uint256,uint256,(uint8,address))",
       [ethereum.Value.fromUnsignedBigInt(param0)]
     );
     if (result.reverted) {
@@ -458,46 +511,47 @@ export class CampaignManager extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new CampaignManager__campaignsResult(
-        value[0].toAddress(),
-        value[1].toString(),
-        value[2].toString(),
-        value[3].toString(),
-        changetype<CampaignManager__campaignsResultTweetRewardStatsStruct>(
-          value[4].toTuple()
-        ),
-        value[5].toBigInt(),
-        value[6].toBigInt(),
-        changetype<CampaignManager__campaignsResultRewardTokenStruct>(
-          value[7].toTuple()
+      changetype<CampaignManager__campaignsResult>(
+        new CampaignManager__campaignsResult(
+          changetype<CampaignManager__campaignsResultOwnerInfoStruct>(
+            value[0].toTuple()
+          ),
+          value[1].toString(),
+          value[2].toString(),
+          value[3].toString(),
+          changetype<CampaignManager__campaignsResultTweetRewardStatsStruct>(
+            value[4].toTuple()
+          ),
+          value[5].toBigInt(),
+          value[6].toBigInt(),
+          changetype<CampaignManager__campaignsResultRewardTokenStruct>(
+            value[7].toTuple()
+          )
         )
       )
     );
   }
 
-  getCampaignInfo(_campaignId: BigInt): CampaignManager__getCampaignInfoResult {
+  getCampaignInfo(
+    _campaignId: BigInt
+  ): CampaignManager__getCampaignInfoResultValue0Struct {
     let result = super.call(
       "getCampaignInfo",
-      "getCampaignInfo(uint256):(string,string,string,uint256,uint256,uint256)",
+      "getCampaignInfo(uint256):(((address,uint256),string,string,string,(uint256,uint256),uint256,uint256,(uint8,address)))",
       [ethereum.Value.fromUnsignedBigInt(_campaignId)]
     );
 
-    return new CampaignManager__getCampaignInfoResult(
-      result[0].toString(),
-      result[1].toString(),
-      result[2].toString(),
-      result[3].toBigInt(),
-      result[4].toBigInt(),
-      result[5].toBigInt()
+    return changetype<CampaignManager__getCampaignInfoResultValue0Struct>(
+      result[0].toTuple()
     );
   }
 
   try_getCampaignInfo(
     _campaignId: BigInt
-  ): ethereum.CallResult<CampaignManager__getCampaignInfoResult> {
+  ): ethereum.CallResult<CampaignManager__getCampaignInfoResultValue0Struct> {
     let result = super.tryCall(
       "getCampaignInfo",
-      "getCampaignInfo(uint256):(string,string,string,uint256,uint256,uint256)",
+      "getCampaignInfo(uint256):(((address,uint256),string,string,string,(uint256,uint256),uint256,uint256,(uint8,address)))",
       [ethereum.Value.fromUnsignedBigInt(_campaignId)]
     );
     if (result.reverted) {
@@ -505,13 +559,51 @@ export class CampaignManager extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new CampaignManager__getCampaignInfoResult(
-        value[0].toString(),
-        value[1].toString(),
-        value[2].toString(),
-        value[3].toBigInt(),
-        value[4].toBigInt(),
-        value[5].toBigInt()
+      changetype<CampaignManager__getCampaignInfoResultValue0Struct>(
+        value[0].toTuple()
+      )
+    );
+  }
+
+  lastTweetInfoRewarded(
+    param0: BigInt,
+    param1: BigInt
+  ): CampaignManager__lastTweetInfoRewardedResult {
+    let result = super.call(
+      "lastTweetInfoRewarded",
+      "lastTweetInfoRewarded(uint256,uint256):(uint256,uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(param0),
+        ethereum.Value.fromUnsignedBigInt(param1)
+      ]
+    );
+
+    return new CampaignManager__lastTweetInfoRewardedResult(
+      result[0].toBigInt(),
+      result[1].toBigInt()
+    );
+  }
+
+  try_lastTweetInfoRewarded(
+    param0: BigInt,
+    param1: BigInt
+  ): ethereum.CallResult<CampaignManager__lastTweetInfoRewardedResult> {
+    let result = super.tryCall(
+      "lastTweetInfoRewarded",
+      "lastTweetInfoRewarded(uint256,uint256):(uint256,uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(param0),
+        ethereum.Value.fromUnsignedBigInt(param1)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(
+      new CampaignManager__lastTweetInfoRewardedResult(
+        value[0].toBigInt(),
+        value[1].toBigInt()
       )
     );
   }
@@ -529,6 +621,38 @@ export class CampaignManager extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  rewardsGiven(param0: BigInt, param1: Address): BigInt {
+    let result = super.call(
+      "rewardsGiven",
+      "rewardsGiven(uint256,address):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(param0),
+        ethereum.Value.fromAddress(param1)
+      ]
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_rewardsGiven(
+    param0: BigInt,
+    param1: Address
+  ): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "rewardsGiven",
+      "rewardsGiven(uint256,address):(uint256)",
+      [
+        ethereum.Value.fromUnsignedBigInt(param0),
+        ethereum.Value.fromAddress(param1)
+      ]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 }
 
@@ -652,6 +776,10 @@ export class CreateCampaignNativeCall__Inputs {
   get _tokensPerRetweet(): BigInt {
     return this._call.inputValues[4].value.toBigInt();
   }
+
+  get _ownerTwitterUserId(): BigInt {
+    return this._call.inputValues[5].value.toBigInt();
+  }
 }
 
 export class CreateCampaignNativeCall__Outputs {
@@ -718,6 +846,62 @@ export class TransferOwnershipCall__Outputs {
   _call: TransferOwnershipCall;
 
   constructor(call: TransferOwnershipCall) {
+    this._call = call;
+  }
+}
+
+export class WithdrawCall extends ethereum.Call {
+  get inputs(): WithdrawCall__Inputs {
+    return new WithdrawCall__Inputs(this);
+  }
+
+  get outputs(): WithdrawCall__Outputs {
+    return new WithdrawCall__Outputs(this);
+  }
+}
+
+export class WithdrawCall__Inputs {
+  _call: WithdrawCall;
+
+  constructor(call: WithdrawCall) {
+    this._call = call;
+  }
+}
+
+export class WithdrawCall__Outputs {
+  _call: WithdrawCall;
+
+  constructor(call: WithdrawCall) {
+    this._call = call;
+  }
+}
+
+export class WithdrawCampaignFundsCall extends ethereum.Call {
+  get inputs(): WithdrawCampaignFundsCall__Inputs {
+    return new WithdrawCampaignFundsCall__Inputs(this);
+  }
+
+  get outputs(): WithdrawCampaignFundsCall__Outputs {
+    return new WithdrawCampaignFundsCall__Outputs(this);
+  }
+}
+
+export class WithdrawCampaignFundsCall__Inputs {
+  _call: WithdrawCampaignFundsCall;
+
+  constructor(call: WithdrawCampaignFundsCall) {
+    this._call = call;
+  }
+
+  get _campaignId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class WithdrawCampaignFundsCall__Outputs {
+  _call: WithdrawCampaignFundsCall;
+
+  constructor(call: WithdrawCampaignFundsCall) {
     this._call = call;
   }
 }

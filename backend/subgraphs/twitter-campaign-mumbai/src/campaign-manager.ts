@@ -23,6 +23,7 @@ export function handleCampaignCreated(event: CampaignCreatedEvent): void {
   entity.tokensPerLike = event.params.tokensPerLike
   entity.tokensPerRetweet = event.params.tokensPerRetweet
   entity.rewardsLeft = event.params.rewardsLeft
+  entity.ownerTwitterUserId = event.params.creatorTwitterUserId
 
   entity.participantCount = BigInt.fromI32(0)
 

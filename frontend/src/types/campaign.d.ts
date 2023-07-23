@@ -2,6 +2,9 @@ export type Campaign = {
   campaignId: string
 
   owner: string
+  ownerTwitterUserId: number
+  ownerTwitterHandle?: string
+
   name: string
   description: string
 

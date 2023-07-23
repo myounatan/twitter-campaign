@@ -9,28 +9,24 @@ import { Web3AuthOptions } from "@web3auth/modal";
 import Transak from "@biconomy/transak";
 import { ethers } from "ethers";
 
+import { cache } from 'react'
+
+
 export const UserContext = createContext<UserContextType | null>(null);
 
 interface Props {
   children: React.ReactNode;
 }
 
-export const getTwitterHandleFromId = async (twitterUserId: string) => {
-  const res = await fetch('/api/twitteruser', {
-    method: 'POST',
-    body: JSON.stringify({ userId: twitterUserId }),
-  });
+type Lookup = {
+  [key: string]: string;
+}
+const TWEET_ID_TO_AUTHOR_HANDLE: Lookup = {
+  '1682751937945513987': '@cryptowesties'
+};
 
-  console.log(res)
-
-  if (res.status === 200) {
-    const data = await res.json();
-    console.log(`Received twitter handle ${data.twitterHandle}`);
-
-    return data.twitterHandle;
-  } else {
-    throw new Error('no twitter handle');
-  }
+const TWITTER_USER_ID_TO_HANDLE: Lookup = {
+  '1371511387021791234': '@cryptowesties'
 }
 
 const UserProvider: React.FC<Props> = ({ children }) => {
@@ -48,6 +44,52 @@ const UserProvider: React.FC<Props> = ({ children }) => {
 
   const [signature, setSignature] = useState<string | null>(null);
 
+  const getTwitterHandleFromId = cache(async (twitterUserId: string) => {
+    console.log(`found pre cache? ${twitterUserId} in ${TWITTER_USER_ID_TO_HANDLE[twitterUserId]}`)
+    if (TWITTER_USER_ID_TO_HANDLE[twitterUserId] !== undefined) {
+      return TWITTER_USER_ID_TO_HANDLE[twitterUserId];
+    }
+
+    const res = await fetch('/api/twitteruser', {
+      method: 'POST',
+      body: JSON.stringify({ userId: twitterUserId }),
+    });
+  
+    console.log(res)
+  
+    if (res.status === 200) {
+      const data = await res.json();
+      console.log(`Received twitter handle ${data.twitterHandle}`);
+  
+      return data.twitterHandle;
+    } else {
+      throw new Error('no twitter handle');
+    }
+  });
+  
+  const getTweetAuthorTwitterHandle = cache(async (tweetId: number) => {
+    console.log(`found pre cache? ${`${tweetId}`} in ${TWEET_ID_TO_AUTHOR_HANDLE[`${tweetId}`]}`)
+    if (TWEET_ID_TO_AUTHOR_HANDLE[`${tweetId}`] !== undefined) {
+      return TWEET_ID_TO_AUTHOR_HANDLE[`${tweetId}`];
+    }
+
+    const res = await fetch('/api/tweetauthor', {
+      method: 'POST',
+      body: JSON.stringify({ tweetId: `${tweetId}` }),
+    });
+  
+    console.log(res)
+  
+    if (res.status === 200) {
+      const data = await res.json();
+      console.log(`Received twitter handle ${data.twitterHandle}`);
+      console.log(`Received twitter user id ${data.twitterUserId}`);
+  
+      return data.twitterHandle;
+    } else {
+      throw new Error('no twitter handle');
+    }
+  });
 
   const options: Web3AuthOptions = {
     clientId: 'BEicrlVSViTgfhBz3NNpCdSG48IGS9-Xf0WD6c7zvrhRtZn9d1WUaC8SJdwbgWWXYixDKITd4IXwmAEoJwBU-Vo',
@@ -219,7 +261,7 @@ const UserProvider: React.FC<Props> = ({ children }) => {
   }
 
   return (
-    <UserContext.Provider value={{ account, signature, loginState, provider, signer, transak, isLoggedIn, loadingLogin, login, logout, fundTransak }}>
+    <UserContext.Provider value={{ account, signature, loginState, provider, signer, transak, isLoggedIn, loadingLogin, login, logout, fundTransak, getTweetAuthorTwitterHandle, getTwitterHandleFromId }}>
       {children}
     </UserContext.Provider>
   );

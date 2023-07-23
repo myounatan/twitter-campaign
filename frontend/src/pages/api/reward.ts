@@ -7,7 +7,7 @@ import { verifyAuthMessage } from './auth';
 
 
 type Data = {
-  txnHash?: string
+  hash?: string
   error?: string
 }
 
@@ -92,11 +92,11 @@ export default async function handler(
     const campaignManagerContract = new ethers.Contract(process.env.CAMPAIGN_MANAGER_ADDRESS, process.env.CAMPAIGN_MANAGER_ABI, signer);
 
     // get campaign info
-    const [_, __, tweetString, ___, ____, _____] = await campaignManagerContract.getCampaignInfo(parseInt(campaignId));
+    const campaignInfo = await campaignManagerContract.getCampaignInfo(parseInt(campaignId));
 
     // check data.text contains tweetString
-    if (!tweet.text.includes(tweetString)) {
-      res.status(400).json({ error: `Tweet does not contain the correct tweet string (${tweetString})` })
+    if (!tweet.text.includes(campaignInfo.tweetString)) {
+      res.status(400).json({ error: `Tweet does not contain the correct tweet string (${campaignInfo.tweetString})` })
       return;
     }
 
@@ -106,7 +106,7 @@ export default async function handler(
     console.log('wallet', wallet)
     const tx = await campaignManagerContract.claimRewardNativeTo(wallet, campaignId, tweetId, [likeCount, retweetCount]);
 
-    res.status(200).json({ txnHash: tx.hash })
+    res.status(200).json({ hash: tx.hash })
   } catch (error: any) {
     console.log(error);
     res.status(500).json({ error: error.message });
