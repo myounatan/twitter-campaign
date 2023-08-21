@@ -138,7 +138,7 @@ const UserProvider: React.FC<Props> = ({ children }) => {
     },
     uiConfig: {
       theme: 'dark',
-      loginMethodsOrder: ['twitter']
+      loginMethodsOrder: ['twitter'],
     }
   }
   
