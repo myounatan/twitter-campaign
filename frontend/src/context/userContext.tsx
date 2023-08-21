@@ -129,7 +129,7 @@ const UserProvider: React.FC<Props> = ({ children }) => {
   }
 
   const options: Web3AuthOptions = {
-    clientId: 'BEicrlVSViTgfhBz3NNpCdSG48IGS9-Xf0WD6c7zvrhRtZn9d1WUaC8SJdwbgWWXYixDKITd4IXwmAEoJwBU-Vo',
+    clientId: 'BOX4NP-CnSsTmoDqPayX4n6W8f_rT0vIOhjmCj6adrRVjSrT4JsjmXV3rii2aDkJsb4u_ttpKZHyVrzAzJF8Hmk',
     web3AuthNetwork: 'testnet',
     chainConfig: {
       chainNamespace: CHAIN_NAMESPACES.EIP155,
