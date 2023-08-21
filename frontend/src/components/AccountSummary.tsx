@@ -41,7 +41,7 @@ export default function AccountSummary() {
               </p>
               <p>
                 Balance&nbsp;
-                <code className={styles.code}>{`$${convertMaticUSD(ethers.utils.parseEther(account?.balance || '0'))} (${account?.balance} MATIC)`}</code>
+                <code className={styles.code}>{`${convertMaticUSD(ethers.utils.parseEther(account?.balance || '0'))} (${account?.balance} MATIC)`}</code>
               </p>
               {isLoggedIn && (
                 <Button variant="outlined" color="inherit" onClick={fundTransak}>

@@ -26,6 +26,10 @@ const TWEET_ID_TO_AUTHOR_HANDLE: Lookup = {
   '1682751937945513987': 'cryptowesties',
   '1682950064732340225': 'cryptowesties',
   '1682951670064447488': 'cryptowesties',
+  '1683052359352475648': 'cryptowesties',
+  '1683041464052228098': 'cryptowesties',
+  '1683036684831653888': 'cryptowesties',
+  '1683018382080081920': 'cryptowesties',
 };
 
 const TWITTER_USER_ID_TO_HANDLE: Lookup = {
