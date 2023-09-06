@@ -1,0 +1,18 @@
+{
+  "name": "twitter-campaign-base-goerli",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ twitter-campaign-base-goerli",
+    "create-local": "graph create --node http://localhost:8020/ twitter-campaign-base-goerli",
+    "remove-local": "graph remove --node http://localhost:8020/ twitter-campaign-base-goerli",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 twitter-campaign-base-goerli",
+    "test": "graph test"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.53.0",
+    "@graphprotocol/graph-ts": "0.30.0"
+  },
+  "devDependencies": { "matchstick-as": "0.5.0" }
+}

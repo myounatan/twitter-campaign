@@ -16,9 +16,25 @@ const config: HardhatUserConfig = {
       accounts: [process.env.DEV_PRIVATE_KEY || ''],
       chainId: 80001,
     },
+    basegoerli: {
+      url: process.env.QUICKNODE_BASEGOERLI,
+      accounts: [process.env.DEV_PRIVATE_KEY || ''],
+      chainId: 84531,
+      gasPrice: 35000000,
+    },
   },
   etherscan: {
-    apiKey: process.env.MUMBAI_SCAN_KEY
+    apiKey: process.env.MUMBAI_SCAN_KEY,
+    customChains: [
+      {
+        network: "basegoerli",
+        chainId: 84531,
+        urls: {
+          apiURL: "https://api-goerli.basescan.org/api",
+          browserURL: "https://goerli.basescan.org/"
+        }
+      }
+    ]
   }
 };
 

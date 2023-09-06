@@ -64,8 +64,8 @@ export default function CampaignList() {
     // })
 
     const mapped = await Promise.all<[Campaign]>(data.campaigns.map(async (campaign: Campaign) => {
-      const tokensPerLike = `${convertMaticUSD(campaign.tokensPerLike)} (${ethers.utils.formatEther(campaign.tokensPerLike)} MATIC)`;
-      const tokensPerRetweet = `${convertMaticUSD(campaign.tokensPerRetweet)} (${ethers.utils.formatEther(campaign.tokensPerRetweet)} MATIC)`;
+      const tokensPerLike = `${convertMaticUSD(campaign.tokensPerLike)} (${ethers.utils.formatEther(campaign.tokensPerLike)} GETH)`;
+      const tokensPerRetweet = `${convertMaticUSD(campaign.tokensPerRetweet)} (${ethers.utils.formatEther(campaign.tokensPerRetweet)} GETH)`;
       let twitterHandle = '';
       try {
         twitterHandle = await getTwitterHandleFromId(campaign.ownerTwitterUserId);
@@ -253,7 +253,7 @@ export default function CampaignList() {
       if (res.status === 200) {
         console.log(`Successfully claimed reward at hash ${data.hash}`);
 
-        enqueueSnackbar(`Successfully claimed reward — ${data.reward} MATIC`, { variant: 'success' });
+        enqueueSnackbar(`Successfully claimed reward — ${data.reward} GETH`, { variant: 'success' });
 
         updateBalance();
       } else {
@@ -378,7 +378,7 @@ export default function CampaignList() {
                     margin="dense"
                     id="form-funds"
                     label="Funds"
-                    helperText={`Initial reward funds (Max ${account?.balance} MATIC)`}
+                    helperText={`Initial reward funds (Max ${account?.balance} GETH)`}
                     placeholder='0.1'
                     type="float"
                     variant="outlined"
@@ -501,7 +501,7 @@ export default function CampaignList() {
                             Tokens per retweet&nbsp;
                             <code className={styles.code}>{campaign.tokensPerRetweet}</code>
                           </p>
-                          <code className={styles.code}> Total Rewards Left: {convertMaticUSD(campaign.rewardsLeft)} ({ethers.utils.formatEther(campaign.rewardsLeft)} MATIC)</code>
+                          <code className={styles.code}> Total Rewards Left: {convertMaticUSD(campaign.rewardsLeft)} ({ethers.utils.formatEther(campaign.rewardsLeft)} GETH)</code>
                           <Stack spacing={2} direction="column">
                             {isLoggedIn ? (
                               <>

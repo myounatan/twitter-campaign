@@ -13,8 +13,8 @@ async function main() {
 
   console.log('CampaignManager deployed to:', campaignManager.address);
 
-  // if network is mumbai
-  if (hre.network.name === 'mumbai') {
+  // if network is mumbai or basegoerli, verify contract
+  if (hre.network.name === 'mumbai' || hre.network.name === 'basegoerli') {
     await verify(hre, campaignManager, 'contracts/CampaignManager.sol:CampaignManager', constructorArgs);
   }
 }

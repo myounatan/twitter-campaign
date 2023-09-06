@@ -21,15 +21,15 @@ const signAuthMessage = async (wallet: string, twitterUserId: any): Promise<stri
 
 export const getBackendProviderSigner = async () => {
   console.log("process.env.DEV_PRIVATE_KEY", process.env.DEV_PRIVATE_KEY)
-  console.log("process.env.NEXT_PUBLIC_QUICKNODE_MUMBAI", process.env.NEXT_PUBLIC_QUICKNODE_MUMBAI)
+  console.log("process.env.NEXT_PUBLIC_QUICKNODE_BASEGOERLI", process.env.NEXT_PUBLIC_QUICKNODE_BASEGOERLI)
   if (!process.env.DEV_PRIVATE_KEY) {
     throw new Error("DEV_PRIVATE_KEY not set");
   }
-  if (!process.env.NEXT_PUBLIC_QUICKNODE_MUMBAI) {
-    throw new Error("NEXT_PUBLIC_QUICKNODE_MUMBAI not set");
+  if (!process.env.NEXT_PUBLIC_QUICKNODE_BASEGOERLI) {
+    throw new Error("NEXT_PUBLIC_QUICKNODE_BASEGOERLI not set");
   }
 
-  const provider = new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_QUICKNODE_MUMBAI);
+  const provider = new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_QUICKNODE_BASEGOERLI);
   const signer = new ethers.Wallet(process.env.DEV_PRIVATE_KEY, provider);
 
   console.log("signer", await signer.getAddress())

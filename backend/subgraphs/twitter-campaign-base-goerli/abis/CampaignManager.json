@@ -1,0 +1,464 @@
+[
+  {
+    "inputs": [
+      { "internalType": "address", "name": "_backendAdmin", "type": "address" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  { "inputs": [], "name": "CampaignDoesNotExist", "type": "error" },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "participant", "type": "address" },
+      { "internalType": "uint256", "name": "amount", "type": "uint256" }
+    ],
+    "name": "FailedToSendRewards",
+    "type": "error"
+  },
+  { "inputs": [], "name": "NoRewardToClaim", "type": "error" },
+  { "inputs": [], "name": "NotEnoughRewardsLeft", "type": "error" },
+  { "inputs": [], "name": "OnlyBackendAdmin", "type": "error" },
+  { "inputs": [], "name": "OnlyCampaignOwner", "type": "error" },
+  { "inputs": [], "name": "ZeroAmount", "type": "error" },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "campaignId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "description",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "tweetString",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokensPerLike",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokensPerRetweet",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "rewardsLeft",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "creatorTwitterUserId",
+        "type": "uint256"
+      }
+    ],
+    "name": "CampaignCreated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "campaignId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "wallet",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tweetId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokensRewarded",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "likesRewarded",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "retweetsRewarded",
+        "type": "uint256"
+      }
+    ],
+    "name": "RewardClaimed",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "backendAdmin",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "likes", "type": "uint256" },
+          { "internalType": "uint256", "name": "retweets", "type": "uint256" }
+        ],
+        "internalType": "struct CampaignManager.TweetInfo",
+        "name": "_lastTweet",
+        "type": "tuple"
+      },
+      {
+        "components": [
+          { "internalType": "uint256", "name": "likes", "type": "uint256" },
+          { "internalType": "uint256", "name": "retweets", "type": "uint256" }
+        ],
+        "internalType": "struct CampaignManager.TweetInfo",
+        "name": "_currentTweet",
+        "type": "tuple"
+      },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "tokensPerLike",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "tokensPerRetweet",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct CampaignManager.TweetRewardStats",
+        "name": "_tweetRewardStats",
+        "type": "tuple"
+      }
+    ],
+    "name": "calculateRewards",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "tokensRewarded",
+        "type": "uint256"
+      },
+      { "internalType": "uint256", "name": "likesRewarded", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "retweetsRewarded",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "campaignCount",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "name": "campaigns",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "address", "name": "owner", "type": "address" },
+          {
+            "internalType": "uint256",
+            "name": "twitterUserId",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct CampaignManager.CampaignOwnerInfo",
+        "name": "ownerInfo",
+        "type": "tuple"
+      },
+      { "internalType": "string", "name": "name", "type": "string" },
+      { "internalType": "string", "name": "description", "type": "string" },
+      { "internalType": "string", "name": "tweetString", "type": "string" },
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "tokensPerLike",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "tokensPerRetweet",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct CampaignManager.TweetRewardStats",
+        "name": "tweetRewardStats",
+        "type": "tuple"
+      },
+      { "internalType": "uint256", "name": "rewardsLeft", "type": "uint256" },
+      {
+        "internalType": "uint256",
+        "name": "totalRewardsGiven",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "enum CampaignManager.RewardType",
+            "name": "rewardType",
+            "type": "uint8"
+          },
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct CampaignManager.RewardToken",
+        "name": "rewardToken",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "participant", "type": "address" },
+      { "internalType": "uint256", "name": "_campaignId", "type": "uint256" },
+      { "internalType": "uint256", "name": "_tweetId", "type": "uint256" },
+      {
+        "components": [
+          { "internalType": "uint256", "name": "likes", "type": "uint256" },
+          { "internalType": "uint256", "name": "retweets", "type": "uint256" }
+        ],
+        "internalType": "struct CampaignManager.TweetInfo",
+        "name": "_currentTweetInfo",
+        "type": "tuple"
+      }
+    ],
+    "name": "claimRewardNativeTo",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "string", "name": "_name", "type": "string" },
+      { "internalType": "string", "name": "_description", "type": "string" },
+      { "internalType": "string", "name": "_tweetString", "type": "string" },
+      {
+        "internalType": "uint256",
+        "name": "_tokensPerLike",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_tokensPerRetweet",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_ownerTwitterUserId",
+        "type": "uint256"
+      }
+    ],
+    "name": "createCampaignNative",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_campaignId", "type": "uint256" }
+    ],
+    "name": "getCampaignInfo",
+    "outputs": [
+      {
+        "components": [
+          {
+            "components": [
+              { "internalType": "address", "name": "owner", "type": "address" },
+              {
+                "internalType": "uint256",
+                "name": "twitterUserId",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct CampaignManager.CampaignOwnerInfo",
+            "name": "ownerInfo",
+            "type": "tuple"
+          },
+          { "internalType": "string", "name": "name", "type": "string" },
+          { "internalType": "string", "name": "description", "type": "string" },
+          { "internalType": "string", "name": "tweetString", "type": "string" },
+          {
+            "components": [
+              {
+                "internalType": "uint256",
+                "name": "tokensPerLike",
+                "type": "uint256"
+              },
+              {
+                "internalType": "uint256",
+                "name": "tokensPerRetweet",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct CampaignManager.TweetRewardStats",
+            "name": "tweetRewardStats",
+            "type": "tuple"
+          },
+          {
+            "internalType": "uint256",
+            "name": "rewardsLeft",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "totalRewardsGiven",
+            "type": "uint256"
+          },
+          {
+            "components": [
+              {
+                "internalType": "enum CampaignManager.RewardType",
+                "name": "rewardType",
+                "type": "uint8"
+              },
+              {
+                "internalType": "address",
+                "name": "tokenAddress",
+                "type": "address"
+              }
+            ],
+            "internalType": "struct CampaignManager.RewardToken",
+            "name": "rewardToken",
+            "type": "tuple"
+          }
+        ],
+        "internalType": "struct CampaignManager.Campaign",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "name": "lastTweetInfoRewarded",
+    "outputs": [
+      { "internalType": "uint256", "name": "likes", "type": "uint256" },
+      { "internalType": "uint256", "name": "retweets", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "address", "name": "", "type": "address" }
+    ],
+    "name": "rewardsGiven",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "newOwner", "type": "address" }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "withdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "_campaignId", "type": "uint256" }
+    ],
+    "name": "withdrawCampaignFunds",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]

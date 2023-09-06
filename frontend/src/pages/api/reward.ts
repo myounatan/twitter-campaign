@@ -84,8 +84,8 @@ export default async function handler(
       throw new Error('DEV_PRIVATE_KEY not set');
     }
 
-    // get RPC provider with NEXT_PUBLIC_QUICKNODE_MUMBAI env var
-    const provider = new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_QUICKNODE_MUMBAI);
+    // get RPC provider with NEXT_PUBLIC_QUICKNODE_BASEGOERLI env var
+    const provider = new ethers.providers.JsonRpcProvider(process.env.NEXT_PUBLIC_QUICKNODE_BASEGOERLI);
 
     // get signer with DEV_PRIVATE_KEY env var
     const signer = new ethers.Wallet(process.env.DEV_PRIVATE_KEY, provider);

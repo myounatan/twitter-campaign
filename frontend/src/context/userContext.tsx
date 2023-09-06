@@ -3,7 +3,7 @@ import React, { useState, createContext } from "react";
 import { UserContextType, Account, LoginState } from '@/types/user';
 import { Web3AuthConfig, Web3AuthModalPack } from "@safe-global/auth-kit";
 import { OpenloginAdapter } from "@web3auth/openlogin-adapter";
-import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
+import { CHAIN_NAMESPACES, IAdapter, WALLET_ADAPTERS } from "@web3auth/base";
 import { Web3AuthOptions } from "@web3auth/modal";
 
 import Transak from "@biconomy/transak";
@@ -133,8 +133,8 @@ const UserProvider: React.FC<Props> = ({ children }) => {
     web3AuthNetwork: 'testnet',
     chainConfig: {
       chainNamespace: CHAIN_NAMESPACES.EIP155,
-      chainId: '0x13881', // mumbai
-      rpcTarget: 'https://fragrant-late-asphalt.matic-testnet.discover.quiknode.pro/9820b93170b99024e4b616370542626027b0f3fd/'
+      chainId: '0x14a33', // base goerli (84531)
+      rpcTarget: 'https://base-goerli.g.alchemy.com/v2/TZ2R4p3zIOKwi7ZeGjyxukxyr4EqZ21V/'
     },
     uiConfig: {
       theme: 'dark',
@@ -175,7 +175,7 @@ const UserProvider: React.FC<Props> = ({ children }) => {
     setLoadingLogin(true);
     
     // Instantiate and initialize the pack
-    await web3AuthModalPack.init({ options, adapters: [openloginAdapter], modalConfig });
+    await web3AuthModalPack.init({ options, adapters: [], modalConfig });
 
     const signData = await web3AuthModalPack.signIn()
 
@@ -245,12 +245,12 @@ const UserProvider: React.FC<Props> = ({ children }) => {
 
     setTransak(transakClient);
 
-    // fetch matic usd price using https://api.polygonscan.com/api?module=stats&action=maticprice&apikey=R3FPMSEVMGYMNGJ9Q9CDJGU1UQS5X4JMD5
+    // fetch Base Goerli eth price
     try {
-      const res = await fetch('https://api.polygonscan.com/api?module=stats&action=maticprice&apikey=R3FPMSEVMGYMNGJ9Q9CDJGU1UQS5X4JMD5');
+      const res = await fetch('https://api-goerli.basescan.org/api?module=stats&action=ethprice&apikey=YourApiKeyToken');
       const data = await res.json();
       console.log(data);
-      setMaticUSDPrice(parseFloat(data.result.maticusd));
+      setMaticUSDPrice(parseFloat(data.result.ethusd));
     } catch (e) {
       console.log(e);
     }

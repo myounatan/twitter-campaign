@@ -1,0 +1,8 @@
+{
+  "base-testnet": {
+    "CampaignManager": {
+      "address": "0x8a67f3b1d8c6B29371BC5Ffd9D858F2a8B1Bf333",
+      "startBlock": 9378287
+    }
+  }
+}

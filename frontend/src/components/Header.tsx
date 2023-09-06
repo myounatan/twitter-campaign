@@ -20,7 +20,7 @@ export default function Header() {
       <Toolbar>
         <Stack spacing={0} direction="column" marginTop={0.5}>
           <Typography variant="h4" color='#ffffff' className={styles.appbar}>
-            Twitter Campaigns &#91;Polygon Mumbai Testnet&#93;
+            Twitter Campaigns &#91;Base Goerli Testnet&#93;
           </Typography>
           <Typography variant="h6" color='#ffffff' className={styles.appbar}>
             Create and participate in on-chain twitter marketing campaigns
