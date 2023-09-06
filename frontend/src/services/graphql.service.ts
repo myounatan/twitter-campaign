@@ -5,7 +5,7 @@ import { ApolloClient, DocumentNode, InMemoryCache, gql } from '@apollo/client'
 
 console.log(process.env.GRAPHQL_ENDPOINT)
 const client = new ApolloClient({
-  uri: process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT,
+  uri: 'https://api.studio.thegraph.com/query/12604/twitter-campaign-base-goerli/v0.0.1',
   cache: new InMemoryCache(),
 })
 
