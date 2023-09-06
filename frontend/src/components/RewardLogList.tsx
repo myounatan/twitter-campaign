@@ -88,7 +88,7 @@ export default function RewardLogList() {
                           </code>
                         </p>
                         <h3>
-                          {`${convertMaticUSD(BigNumber.from(log.tokensRewarded).toNumber())} (${log.tokensRewardedFormatted} GETH)`}
+                          {`${convertMaticUSD(BigNumber.from(log.tokensRewarded).toNumber())} (${log.tokensRewardedFormatted} GETH) rewarded`}
                         </h3>
                         </Stack>
                       </div>
