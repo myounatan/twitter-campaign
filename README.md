@@ -1,5 +1,4 @@
-# Twitter Campaign
-## EthGlobal Paris 2023 Finalist
+# Twitter Campaign - ETHGlobal Paris 2023 Finalist
 
 Twitter Campaigns is an on-chain A.I. enabled DAO-tool to create Twitter marketing campaigns that live on a smart-contract, taking DAO-tooling and social proof to a whole new level. The goal of this dapp is two-fold: To enable DAO's, or anybody to gain promotional social media posts through tokenized incentive, and to enable more non-crypto experts in participating in these incentives through FOMO and social-proof. As twitter is one of the most popular social networks in the world, we leverage the authentication and user accounts that already exist on Twitter and enable crypto functionality on top of it. The dapp UI is made up of 3 sections: 1. Account Summary, 2. Campaigns, and 3. Reward Logs.
 
